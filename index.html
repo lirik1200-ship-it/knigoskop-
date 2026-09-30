@@ -6,7 +6,30 @@
 <meta name="description" content="Книгоскопъ — игра по русской литературе: узнайте произведение по сцене.">
 <meta name="theme-color" content="#000000">
 <link rel="icon" href="img/emblem.png">
-<style>[hidden]{display:none!important}body{margin:0}</style>
+<style>[hidden]{display:none!important}body{margin:0}
+/* ---------- author byline & access gate ---------- */
+.byline{display:grid;grid-template-columns:56px 1fr;gap:var(--s-sm) var(--s-md);align-items:center;padding-top:var(--s-lg);border-top:2px solid var(--ink);}
+.byline .byline-ph{width:56px;height:56px;border-radius:9999px;object-fit:cover;filter:grayscale(1);}
+.byline-tx{display:flex;flex-direction:column;gap:2px;}
+.byline-lab{font-family:var(--ui);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--body);}
+.byline-tx b{font-family:var(--display);font-weight:400;font-size:22px;line-height:1.1;color:var(--ink);}
+.byline-tx small{font-family:var(--serif);font-size:14px;line-height:1.35;color:var(--body);}
+.promo-links{grid-column:1 / -1;display:flex;flex-wrap:wrap;gap:var(--s-sm);}
+.promo-links .ink-btn{flex:1 1 150px;text-align:center;text-decoration:none;}
+.byline-fin{margin-top:var(--s-sm);}
+.gate{position:absolute;inset:0;z-index:12;overflow:auto;background:var(--canvas);box-shadow:inset 0 6px 0 var(--ink);display:flex;justify-content:center;padding:0 var(--s-lg);}
+.gate-card{width:100%;max-width:440px;margin:auto 0;padding:var(--s-3xl) 0;display:flex;flex-direction:column;gap:var(--s-md);}
+.gate-card>*{animation:up .45s var(--ease-in) both;}
+.gate-card img[src$="emblem.png"]{width:56px;height:56px;filter:grayscale(1);}
+.gate-card h1{margin:0;font-family:var(--display);font-weight:400;font-size:clamp(44px,12vw,64px);letter-spacing:-.02em;line-height:.95;}
+.gate-card .sub{margin:0 0 var(--s-sm);padding:var(--s-sm) 0;border-top:2px solid var(--ink);border-bottom:1px solid var(--ink);font-family:var(--ui);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;}
+.gate-card label{font-family:var(--ui);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;}
+.gate-card #gateCode{text-transform:uppercase;letter-spacing:.1em;}
+.gate-card .msg{margin:0;}
+.gate-card .seal-btn{align-self:stretch;}
+.gate-card .note a{color:var(--link);}
+.gate-card .byline{margin-top:var(--s-lg);}
+</style>
 </head>
 <body>
 <title>Книгоскопъ</title>
@@ -504,6 +527,11 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:2px so
       <div class="fin-teams" id="finTeams" hidden></div>
       <p class="note" id="finSync" style="text-align:center" hidden></p>
       <div id="finList"></div>
+      <aside class="byline byline-fin">
+        <img class="byline-ph" src="img/author.jpg" alt="Кирилл Минкин">
+        <div class="byline-tx"><span class="byline-lab">Понравилась игра?</span><b>Кирилл Минкин</b><small>Разборы литературы и подготовка к ЕГЭ — в Telegram и ВКонтакте</small></div>
+        <div class="promo-links"><a class="ink-btn" href="https://t.me/egeminkin" target="_blank" rel="noopener">Telegram @egeminkin</a><a class="ink-btn" href="https://vk.ru/egeminkin" target="_blank" rel="noopener">ВКонтакте</a></div>
+      </aside>
       <div class="next-row"><button class="seal-btn" id="btnAgain">Ещё партию</button></div>
     </article>
   </div>
@@ -533,6 +561,11 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:2px so
           <button class="ink-btn" id="btnTeacher" hidden>Кабинет учителя</button>
         </div>
       </div>
+      <aside class="byline">
+        <img class="byline-ph" src="img/author.jpg" alt="Кирилл Минкин">
+        <div class="byline-tx"><span class="byline-lab">Автор игры</span><b>Кирилл Минкин</b><small>учитель русского языка и литературы</small></div>
+        <div class="promo-links"><a class="ink-btn" href="https://t.me/egeminkin" target="_blank" rel="noopener">Telegram @egeminkin</a><a class="ink-btn" href="https://vk.ru/egeminkin" target="_blank" rel="noopener">ВКонтакте</a></div>
+      </aside>
     </div>
   </div>
 
@@ -568,6 +601,24 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:2px so
     <div id="resTable"><p class="note">Выберите урок, чтобы увидеть результаты.</p></div>
     <div class="prow"><button class="pbtn" data-closep>Закрыть</button></div>
   </article></div>
+
+  <div class="gate" id="gate" hidden>
+    <form class="gate-card" id="gateForm" autocomplete="off">
+      <img src="img/emblem.png" alt="">
+      <h1>Книгоскопъ</h1>
+      <p class="sub">тестовая версия · вход по коду</p>
+      <label for="gateCode">Код доступа</label>
+      <input class="txt-in" id="gateCode" placeholder="введите код" autocapitalize="characters" spellcheck="false">
+      <p class="msg" id="gateMsg"></p>
+      <button class="seal-btn" type="submit">Войти</button>
+      <p class="note">Код можно получить в Telegram-канале <a href="https://t.me/egeminkin" target="_blank" rel="noopener">@egeminkin</a>.</p>
+      <aside class="byline">
+        <img class="byline-ph" src="img/author.jpg" alt="Кирилл Минкин">
+        <div class="byline-tx"><span class="byline-lab">Автор игры</span><b>Кирилл Минкин</b><small>учитель русского языка и литературы</small></div>
+        <div class="promo-links"><a class="ink-btn" href="https://t.me/egeminkin" target="_blank" rel="noopener">Telegram @egeminkin</a><a class="ink-btn" href="https://vk.ru/egeminkin" target="_blank" rel="noopener">ВКонтакте</a></div>
+      </aside>
+    </form>
+  </div>
 </div>
 
 <script>
@@ -1474,5 +1525,23 @@ newGame(6);
 drawRuler();
 </script>
 
+<script>
+/* --- access gate (test version): only a hash of the code is stored --- */
+(function(){
+  const HASH=8079394663477591, KEY='knigoskop_access';
+  function h(str,seed){let h1=0xdeadbeef^seed,h2=0x41c6ce57^seed;for(let i=0;i<str.length;i++){const c=str.charCodeAt(i);h1=Math.imul(h1^c,2654435761);h2=Math.imul(h2^c,1597334677);}
+    h1=Math.imul(h1^(h1>>>16),2246822507);h1^=Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507);h2^=Math.imul(h1^(h1>>>13),3266489909);return 4294967296*(2097151&h2)+(h1>>>0);}
+  const norm=v=>(v||'').toUpperCase().replace(/Ё/g,'Е').replace(/\s+/g,'');
+  let ok=false; try{ok=localStorage.getItem(KEY)===String(HASH);}catch(e){}
+  const gate=document.getElementById('gate'); if(ok) return;
+  gate.hidden=false; setTimeout(()=>document.getElementById('gateCode').focus(),50);
+  document.getElementById('gateForm').addEventListener('submit',e=>{e.preventDefault();
+    const m=document.getElementById('gateMsg');
+    if(h(norm(document.getElementById('gateCode').value),7)===HASH){try{localStorage.setItem(KEY,String(HASH));}catch(e){} gate.hidden=true;}
+    else{m.className='msg';m.textContent='Неверный код. Проверьте раскладку клавиатуры.';}
+  });
+  document.getElementById('gateCode').addEventListener('input',()=>{document.getElementById('gateMsg').textContent='';});
+})();
+</script>
 </body>
 </html>
