@@ -23,8 +23,9 @@
 .gate-card img[src$="emblem.png"]{width:56px;height:56px;filter:grayscale(1);}
 .gate-card h1{margin:0;font-family:var(--display);font-weight:400;font-size:clamp(44px,12vw,64px);letter-spacing:-.02em;line-height:.95;}
 .gate-card .sub{margin:0 0 var(--s-sm);padding:var(--s-sm) 0;border-top:2px solid var(--ink);border-bottom:1px solid var(--ink);font-family:var(--ui);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;}
-.gate-card label{font-family:var(--ui);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;}
-.gate-card #gateCode{text-transform:uppercase;letter-spacing:.1em;}
+.gate-lead{margin:0;font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--ink-soft);}
+.gate-go{display:block;text-align:center;text-decoration:none;box-sizing:border-box;}
+.gate-card .msg.wait{color:var(--body);}
 .gate-card .msg{margin:0;}
 .gate-card .seal-btn{align-self:stretch;}
 .gate-card .note a{color:var(--link);}
@@ -603,21 +604,19 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:2px so
   </article></div>
 
   <div class="gate" id="gate" hidden>
-    <form class="gate-card" id="gateForm" autocomplete="off">
+    <div class="gate-card">
       <img src="img/emblem.png" alt="">
       <h1>Книгоскопъ</h1>
-      <p class="sub">тестовая версия · вход по коду</p>
-      <label for="gateCode">Код доступа</label>
-      <input class="txt-in" id="gateCode" placeholder="введите код" autocapitalize="characters" spellcheck="false">
-      <p class="msg" id="gateMsg"></p>
-      <button class="seal-btn" type="submit">Войти</button>
-      <p class="note">Код можно получить в Telegram-канале <a href="https://t.me/egeminkin" target="_blank" rel="noopener">@egeminkin</a>.</p>
+      <p class="sub">тестовая версия · для подписчиков</p>
+      <p class="gate-lead">Игра открыта для подписчиков Telegram-канала <b>@egeminkin</b>. Нажмите кнопку — бот проверит подписку и пришлёт ссылку для входа.</p>
+      <a class="seal-btn gate-go" id="gateGo" href="#" target="_blank" rel="noopener">Получить доступ в Telegram</a>
+      <p class="msg" id="gateMsg" role="status"></p>
       <aside class="byline">
         <img class="byline-ph" src="img/author.jpg" alt="Кирилл Минкин">
         <div class="byline-tx"><span class="byline-lab">Автор игры</span><b>Кирилл Минкин</b><small>учитель русского языка и литературы</small></div>
         <div class="promo-links"><a class="ink-btn" href="https://t.me/egeminkin" target="_blank" rel="noopener">Telegram @egeminkin</a><a class="ink-btn" href="https://vk.ru/egeminkin" target="_blank" rel="noopener">ВКонтакте</a></div>
       </aside>
-    </form>
+    </div>
   </div>
 </div>
 
@@ -1526,21 +1525,26 @@ drawRuler();
 </script>
 
 <script>
-/* --- access gate (test version): only a hash of the code is stored --- */
+/* --- access gate: only Telegram-channel subscribers (checked by worker/knigoskop-bot.js) --- */
 (function(){
-  const HASH=8079394663477591, KEY='knigoskop_access';
-  function h(str,seed){let h1=0xdeadbeef^seed,h2=0x41c6ce57^seed;for(let i=0;i<str.length;i++){const c=str.charCodeAt(i);h1=Math.imul(h1^c,2654435761);h2=Math.imul(h2^c,1597334677);}
-    h1=Math.imul(h1^(h1>>>16),2246822507);h1^=Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507);h2^=Math.imul(h1^(h1>>>13),3266489909);return 4294967296*(2097151&h2)+(h1>>>0);}
-  const norm=v=>(v||'').toUpperCase().replace(/Ё/g,'Е').replace(/\s+/g,'');
-  let ok=false; try{ok=localStorage.getItem(KEY)===String(HASH);}catch(e){}
-  const gate=document.getElementById('gate'); if(ok) return;
-  gate.hidden=false; setTimeout(()=>document.getElementById('gateCode').focus(),50);
-  document.getElementById('gateForm').addEventListener('submit',e=>{e.preventDefault();
-    const m=document.getElementById('gateMsg');
-    if(h(norm(document.getElementById('gateCode').value),7)===HASH){try{localStorage.setItem(KEY,String(HASH));}catch(e){} gate.hidden=true;}
-    else{m.className='msg';m.textContent='Неверный код. Проверьте раскладку клавиатуры.';}
-  });
-  document.getElementById('gateCode').addEventListener('input',()=>{document.getElementById('gateMsg').textContent='';});
+  const API='__WORKER_URL__', BOT='__BOT_NAME__';
+  const KT='knigoskop_tg', KV='knigoskop_tg_ok', FRESH=12*3600e3, GRACE=7*24*3600e3;
+  const gate=document.getElementById('gate'), msg=document.getElementById('gateMsg');
+  const get=k=>{try{return localStorage.getItem(k)}catch(e){return null}}, set=(k,v)=>{try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch(e){}};
+  document.getElementById('gateGo').href='https://t.me/'+BOT+'?start=game';
+  const m=location.hash.match(/access=([\w.-]+)/);
+  if(m){set(KT,m[1]);set(KV,null);history.replaceState(null,'',location.pathname+location.search);}
+  const t=get(KT), last=+get(KV)||0;
+  const show=(text,cls)=>{gate.hidden=false;msg.className='msg'+(cls?' '+cls:'');msg.textContent=text||'';};
+  if(!t){show();return;}
+  if(Date.now()-last<FRESH) return;
+  show('Проверяю подписку…','wait');
+  fetch(API+'/verify?t='+encodeURIComponent(t)).then(r=>r.json()).then(d=>{
+    if(d.ok){set(KV,String(Date.now()));gate.hidden=true;return;}
+    if(d.reason==='error'){ if(Date.now()-last<GRACE){gate.hidden=true;return;} show('Не получилось проверить подписку. Попробуйте позже.');return;}
+    set(KT,null);set(KV,null);
+    show(d.reason==='unsubscribed'?'Подписка на канал не найдена. Подпишитесь и получите новую ссылку у бота.':'Ссылка устарела. Получите новую у бота.');
+  }).catch(()=>{ if(Date.now()-last<GRACE){gate.hidden=true;return;} show('Нет связи с сервером. Проверьте интернет и обновите страницу.');});
 })();
 </script>
 </body>
