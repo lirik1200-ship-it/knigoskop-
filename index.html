@@ -1527,7 +1527,7 @@ drawRuler();
 <script>
 /* --- access gate: only Telegram-channel subscribers (checked by worker/knigoskop-bot.js) --- */
 (function(){
-  const API='__WORKER_URL__', BOT='__BOT_NAME__';
+  const API='https://knigoskop.lirik1200.workers.dev', BOT='knigoskop_bot';
   const KT='knigoskop_tg', KV='knigoskop_tg_ok', FRESH=12*3600e3, GRACE=7*24*3600e3;
   const gate=document.getElementById('gate'), msg=document.getElementById('gateMsg');
   const get=k=>{try{return localStorage.getItem(k)}catch(e){return null}}, set=(k,v)=>{try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch(e){}};
