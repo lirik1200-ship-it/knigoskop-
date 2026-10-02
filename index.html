@@ -1005,7 +1005,7 @@ const SPOTS={
           {x:.44,y:.43,w:.08,h:.12,t:'Самовар',q:'Гостей встречают радушно. Хозяин умеет шутить, но шутки одни и те же много лет.'}]
 };
 ROUNDS.forEach(r=>{if(SPOTS[r.id]) r.spots=SPOTS[r.id];});
-const READY = ["aust", "blok", "borodino", "braslet", "capri", "chp", "don", "famusov", "fili", "glupov", "grib", "groza", "ilya", "ionych", "kapdoch", "levsha", "liza", "matryona", "meri", "mtsyri", "nadne", "nekrasov", "oblomov", "onegin", "otcy", "pin", "plyushkin", "rekviem", "revizor", "sad", "shen", "shinel", "slovo", "sobach", "strannik", "taman", "vsadnik"];
+const READY = ["aust", "blok", "borodino", "braslet", "capri", "chp", "don", "famusov", "fili", "glupov", "grib", "groza", "ionych", "kapdoch", "levsha", "liza", "matryona", "meri", "mtsyri", "nadne", "nekrasov", "oblomov", "onegin", "otcy", "pin", "plyushkin", "rekviem", "revizor", "sad", "shen", "shinel", "slovo", "sobach", "strannik", "taman", "vsadnik"];
 const POOL = ROUNDS.filter(r=>READY.includes(r.id));
 POOL.forEach(r=>{r.img='img/s_'+r.id+'.webp';});
 const CITY = Object.fromEntries(MAP.cities.map(c=>[c.id,c]));
