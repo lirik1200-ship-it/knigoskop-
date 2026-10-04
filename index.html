@@ -707,7 +707,7 @@ const ROUNDS = [
    author:'lermontov', dir:3, year:'1839', place:'Кавказ, горы у слияния Арагвы и Куры', city:'kavkaz', tol:250, accept:['кавказ','мцхет','грузи','арагв','тифлис','тбилис'],
    desc:'Послушник Мцыри бежит из монастыря и три дня живёт на воле в горах. Главное испытание — бой с барсом: безоружный юноша выламывает сук и побеждает зверя, но получает смертельные раны. Внизу — то самое место, где сливаются Арагва и Кура.',
    quote:'Немного лет тому назад,\nТам, где, сливаяся, шумят,\nОбнявшись, будто две сестры,\nСтруи Арагвы и Куры,\nБыл монастырь.', cite:'М. Ю. Лермонтов, «Мцыри»'},
-  {id:'izergil', set:2, details:['голубые искры в степи','тень над степью','шаль и посох у костра','виноградники и море'], img:'img/s_izergil.jpg', title:'Старуха Изергиль', titleAlt:['старуха изергиль','изергиль'],
+  {id:'izergil', set:2, details:['голубые искры в степи','тень над степью','шаль и посох у костра','виноградники и море'], img:'img/s_izergil.webp', title:'Старуха Изергиль', titleAlt:['старуха изергиль','изергиль'],
    author:'gorky', dir:3, year:'1895', place:'Бессарабия, морской берег под Аккерманом', city:'akkerman', tol:120, accept:['аккерман','бессараб','белгород днестр','молдав'],
    desc:'Ночь после сбора винограда на берегу моря под Аккерманом. Старуха Изергиль рассказывает две легенды: о гордом Ларре, сыне орла, наказанном вечным одиночеством, и о Данко, который вырвал из груди горящее сердце, чтобы вывести людей из тёмного леса. Между легендами — история её собственной жизни.',
    quote:'Я слышал эти рассказы под Аккерманом, в Бессарабии, на морском берегу.', cite:'М. Горький, «Старуха Изергиль»'},
@@ -1054,7 +1054,7 @@ const SPOTS={
           {x:.44,y:.43,w:.08,h:.12,t:'Самовар',q:'Гостей встречают радушно. Хозяин умеет шутить, но шутки одни и те же много лет.'}]
 };
 ROUNDS.forEach(r=>{if(SPOTS[r.id]) r.spots=SPOTS[r.id];});
-const READY = ["aust", "blok", "borodino", "braslet", "capri", "chp", "don", "famusov", "fili", "glupov", "grib", "groza", "ionych", "kapdoch", "levsha", "liza", "matryona", "meri", "mtsyri", "nadne", "nekrasov", "oblomov", "onegin", "otcy", "pin", "plyushkin", "rekviem", "revizor", "sad", "shen", "shinel", "slovo", "sobach", "strannik", "taman", "vsadnik"];
+const READY = ["aust", "blok", "borodino", "braslet", "capri", "chp", "don", "famusov", "fili", "glupov", "grib", "izergil", "groza", "ionych", "kapdoch", "levsha", "liza", "matryona", "meri", "mtsyri", "nadne", "nekrasov", "oblomov", "onegin", "otcy", "pin", "plyushkin", "rekviem", "revizor", "sad", "shen", "shinel", "slovo", "sobach", "strannik", "taman", "vsadnik"];
 const POOL = ROUNDS.filter(r=>READY.includes(r.id));
 POOL.forEach(r=>{r.img='img/s_'+r.id+'.webp';});
 const CITY = Object.fromEntries(MAP.cities.map(c=>[c.id,c]));
