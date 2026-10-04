@@ -19,6 +19,14 @@
 .grade-tools{display:flex;justify-content:space-between;align-items:baseline;gap:var(--s-md);margin-top:calc(-1 * var(--s-md));}
 .grade-note{font-family:var(--serif);font-style:italic;font-size:14px;color:var(--body);}
 .grade-all{font-family:var(--ui);font-size:13px;font-weight:700;color:var(--ink);text-decoration:underline;text-underline-offset:3px;white-space:nowrap;}
+.lesson-bar{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:12px 14px;border:1px solid var(--ink);background:var(--canvas-soft);font-family:var(--ui);font-weight:500;font-size:14px;}
+.ts-bar{position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;align-items:baseline;padding:10px 0;background:var(--canvas);border-bottom:1px solid var(--ink);font-family:var(--ui);font-weight:700;font-size:14px;}
+.ts-grade{margin-top:var(--s-lg);}
+.ts-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding-bottom:6px;border-bottom:2px solid var(--ink);}
+.panel .page .ts-head h3{margin:0;}
+.ts-grade label{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--hairline);cursor:pointer;font-family:var(--display);font-size:18px;line-height:1.2;}
+.ts-grade label small{display:block;margin-top:3px;font-family:var(--ui);font-size:12px;color:var(--body);}
+.ts-grade input{accent-color:var(--ink);width:18px;height:18px;margin-top:2px;flex:none;}
 /* ---------- author byline & access gate ---------- */
 .byline{display:grid;grid-template-columns:56px 1fr;gap:var(--s-sm) var(--s-md);align-items:center;padding-top:var(--s-lg);border-top:2px solid var(--ink);}
 .byline .byline-ph{width:56px;height:56px;border-radius:9999px;object-fit:cover;filter:grayscale(1);}
@@ -563,9 +571,10 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:2px so
         <li><span><b>Панель мешает?</b> Сверните её язычком сверху и разверните, когда будете готовы ответить.</span></li>
       </ol>
       <p class="score-line">За главу до 5 000 очков: место 1 500, направление 1 000, автор 1 000, название 1 500. После ответа можно получить ещё 300 за вопрос в духе ЕГЭ.</p>
-      <div class="count-lab">Класс</div>
+      <div class="lesson-bar" id="lessonBar" hidden><span id="lessonTxt"></span><button class="grade-all" id="lessonOff" type="button">Играть все сцены</button></div>
+      <div class="count-lab" id="gradeLab">Класс</div>
       <div class="grade-row" id="gradeRow" role="group" aria-label="Выбор классов"></div>
-      <div class="grade-tools"><span class="grade-note" id="gradeNote"></span><button class="grade-all" id="gradeAll" type="button">Все классы</button></div>
+      <div class="grade-tools" id="gradeTools"><span class="grade-note" id="gradeNote"></span><button class="grade-all" id="gradeAll" type="button">Все классы</button></div>
       <div class="count-lab">Сколько сцен?</div>
       <div class="count-row" id="countRow"></div>
       <div class="modes">
@@ -574,6 +583,7 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:2px so
         <div class="mode-row">
           <button class="ink-btn" id="btnLesson" hidden>Урок по коду</button>
           <button class="ink-btn" id="btnLib">Моя библиотека</button>
+          <button class="ink-btn" id="btnTeacherSet">Для учителя</button>
           <button class="ink-btn" id="btnTeacher" hidden>Кабинет учителя</button>
         </div>
       </div>
@@ -584,6 +594,16 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:2px so
       </aside>
     </div>
   </div>
+
+  <div class="screen panel" id="tsPanel" hidden><article class="page">
+    <h2>Кабинет учителя</h2>
+    <p class="note">Отметьте сцены, которые должны выпасть ученикам, и скопируйте ссылку на этот набор. Ученик, открывший ссылку, играет именно в отмеченные сцены. Доступ по подписке на канал нужен по-прежнему: после входа набор сохранится.</p>
+    <div class="ts-bar"><span id="tsCount">Выбрано: 0</span><button class="grade-all" id="tsReset" type="button">Сбросить</button></div>
+    <div id="tsList"></div>
+    <div class="fld"><label for="tsLink">Ссылка для учеников</label><input class="txt-in" id="tsLink" readonly></div>
+    <p class="msg" id="tsMsg"></p>
+    <div class="prow"><button class="pbtn" id="tsCopy" type="button">Скопировать ссылку</button><button class="pbtn ghost" id="tsPlay" type="button">Показать как у учеников</button><button class="pbtn ghost" data-closep>Закрыть</button></div>
+  </article></div>
 
   <div class="screen panel" id="libPanel" hidden><article class="page">
     <h2>Моя библиотека</h2>
@@ -1373,9 +1393,17 @@ const GRADE_LIST=[5,6,7,8,9,10,11];
 const inGrades=(R,set)=>(GRADES[R.id]||GRADE_LIST).some(g=>set.has(g));
 const gradeCount=g=>POOL.filter(R=>inGrades(R,new Set([g]))).length;
 const selGrades=new Set(GRADE_LIST.filter(g=>gradeCount(g)>0));
-const gradePool=()=>POOL.filter(R=>inGrades(R,selGrades));
+let LESSON=null; // набор сцен от учителя (id), если открыта ссылка ?s=…
+const LKEY='knigoskop_lesson';
+{const q=new URLSearchParams(location.search).get('s'); let ids=null;
+ if(q){ids=q.split(',').map(x=>x.trim()).filter(Boolean);}
+ else{try{const v=JSON.parse(localStorage.getItem(LKEY)||'null');if(Array.isArray(v))ids=v;}catch(e){}}
+ if(ids){const ok=ids.filter(id=>POOL.some(R=>R.id===id)); if(ok.length){LESSON=ok; try{localStorage.setItem(LKEY,JSON.stringify(ok));}catch(e){}}}}
+const gradePool=()=>LESSON?POOL.filter(R=>LESSON.includes(R.id)):POOL.filter(R=>inGrades(R,selGrades));
 const sceneWord=n=>n===1?'сцена':n<5?'сцены':'сцен';
 function renderGrades(){
+  ['gradeLab','gradeRow','gradeTools'].forEach(id=>$(id).hidden=!!LESSON); $('lessonBar').hidden=!LESSON;
+  if(LESSON){const n=gradePool().length;$('lessonTxt').textContent='Набор от учителя: '+n+' '+sceneWord(n);return;}
   $('gradeRow').innerHTML=GRADE_LIST.map(g=>{const c=gradeCount(g);return c?`<button type="button" data-g="${g}" aria-pressed="${selGrades.has(g)}" aria-label="${g} класс, ${c} ${sceneWord(c)}">${g}<small>${c}</small></button>`:`<button type="button" disabled aria-label="${g} класс, скоро">${g}<small>скоро</small></button>`;}).join('');
   $('gradeRow').querySelectorAll('button[data-g]').forEach(b=>b.onclick=()=>{const g=+b.dataset.g;if(selGrades.has(g)){if(selGrades.size>1)selGrades.delete(g);}else selGrades.add(g);renderGrades();renderCount();});
   const n=gradePool().length; $('gradeNote').textContent='В выбранных классах: '+n+' '+sceneWord(n);
@@ -1387,6 +1415,30 @@ function renderCount(){
   cr.querySelectorAll('button').forEach(b=>b.onclick=()=>{const tm=$('teamTg').checked?[$('teamA').value.trim()||'Команда 1',$('teamB').value.trim()||'Команда 2']:null;newGame(0,{teams:tm,list:shuffle(gradePool()).slice(0,+b.dataset.n)});drawRuler();$('intro').hidden=true;});
 }
 $('gradeAll').onclick=()=>{GRADE_LIST.forEach(g=>{if(gradeCount(g)>0)selGrades.add(g);});renderGrades();renderCount();};
+$('lessonOff').onclick=()=>{LESSON=null;try{localStorage.removeItem(LKEY);}catch(e){}history.replaceState(null,'',location.href.split(/[?#]/)[0]);renderGrades();renderCount();};
+/* --- кабинет учителя: набор сцен галочками → ссылка для учеников --- */
+const TKEY='knigoskop_teacher_sel';
+function tsSel(){return [...new Set([...document.querySelectorAll('#tsList input:checked')].map(i=>i.value))];}
+function tsUpdate(){const ids=tsSel(); $('tsCount').textContent='Выбрано: '+ids.length+' '+sceneWord(ids.length); $('tsLink').value=ids.length?location.href.split(/[?#]/)[0]+'?s='+ids.join(','):''; $('tsMsg').textContent='';
+  try{localStorage.setItem(TKEY,JSON.stringify(ids));}catch(e){}}
+function openTeacherSet(){
+  let saved=[]; try{saved=JSON.parse(localStorage.getItem(TKEY)||'[]');}catch(e){}
+  $('tsList').innerHTML=GRADE_LIST.filter(g=>gradeCount(g)>0).map(g=>{
+    const sc=POOL.filter(R=>inGrades(R,new Set([g])));
+    return `<section class="ts-grade"><div class="ts-head"><h3>${g} класс</h3><button type="button" class="grade-all" data-tg="${g}">Выбрать весь класс</button></div>`+
+      sc.map(R=>{const au=AUTHORS.find(a=>a.id===R.author);return `<label><input type="checkbox" value="${R.id}"${saved.includes(R.id)?' checked':''}><span>«${esc(R.title)}»<small>${esc(au.name)} · ${esc(R.place)}</small></span></label>`;}).join('')+'</section>';}).join('');
+  $('tsList').querySelectorAll('[data-tg]').forEach(b=>b.onclick=()=>{const bx=[...b.closest('section').querySelectorAll('input')],on=bx.some(i=>!i.checked);bx.forEach(i=>i.checked=on);tsUpdate();});
+  $('tsList').querySelectorAll('input').forEach(i=>i.onchange=tsUpdate);
+  tsUpdate(); $('tsPanel').hidden=false; $('tsPanel').scrollTop=0;
+}
+$('btnTeacherSet').onclick=openTeacherSet;
+$('tsReset').onclick=()=>{document.querySelectorAll('#tsList input').forEach(i=>i.checked=false);tsUpdate();};
+$('tsLink').onfocus=e=>e.target.select();
+$('tsCopy').onclick=()=>{const m=$('tsMsg'),v=$('tsLink').value; if(!v){m.className='msg';m.textContent='Отметьте хотя бы одну сцену';return;}
+  const ok=()=>{m.className='msg ok';m.textContent='Ссылка скопирована';}, no=()=>{$('tsLink').select();m.className='msg';m.textContent='Скопируйте ссылку из поля вручную';};
+  (navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(v).then(ok,no):Promise.reject()).catch(no);};
+$('tsPlay').onclick=()=>{const ids=tsSel(); if(!ids.length){$('tsMsg').className='msg';$('tsMsg').textContent='Отметьте хотя бы одну сцену';return;}
+  LESSON=ids; $('tsPanel').hidden=true; renderGrades(); renderCount(); $('intro').scrollTop=0;};
 renderGrades(); renderCount();
 const EGE={
  slovo:{q:'Ярославна обращается к Ветру, Днепру и Солнцу. Как называется такой приём?',o:['Риторическое обращение','Гипербола','Литота','Градация'],a:0,e:'Обращение к неодушевлённому как к живому собеседнику: риторическое обращение (апострофа) в сочетании с олицетворением.'},
