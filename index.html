@@ -45,6 +45,11 @@
 .gate-card .sub{margin:0 0 var(--s-sm);padding:var(--s-sm) 0;border-top:2px solid var(--ink);border-bottom:1px solid var(--ink);font-family:var(--ui);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;}
 .gate-lead{margin:0;font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--ink-soft);}
 .gate-go{display:block;text-align:center;text-decoration:none;box-sizing:border-box;}
+.gate-codelink{align-self:center;margin:var(--s-sm) 0 0;padding:6px 2px;border:0;border-bottom:1px solid var(--ink);background:none;color:var(--ink);font-family:var(--ui);font-weight:600;font-size:13px;letter-spacing:.3px;cursor:pointer;}
+.gate-codelink:hover{background:var(--ink);color:var(--canvas);}
+.gate-code{display:flex;flex-direction:column;gap:var(--s-sm);}
+.gate-code[hidden]{display:none;}
+.gate-code .txt-in{text-transform:uppercase;letter-spacing:2px;text-align:center;font-family:var(--ui);font-size:17px;}
 .gate-card .msg.wait{color:var(--body);}
 .gate-card .msg{margin:0;}
 .gate-card .seal-btn{align-self:stretch;}
@@ -645,6 +650,11 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:2px so
       <p class="sub">тестовая версия · для подписчиков</p>
       <p class="gate-lead">Игра открыта для подписчиков Telegram-канала <b>@egeminkin</b>. Нажмите кнопку — бот проверит подписку и пришлёт ссылку для входа.</p>
       <a class="seal-btn gate-go" id="gateGo" href="#" target="_blank" rel="noopener">Получить доступ в Telegram</a>
+      <button class="gate-codelink" id="codeToggle" type="button">Вход по коду для коллег</button>
+      <form class="gate-code" id="codeForm" hidden autocomplete="off">
+        <input class="txt-in" id="codeInput" placeholder="КОД ДОСТУПА" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Код доступа">
+        <button class="ink-btn" type="submit">Войти</button>
+      </form>
       <p class="msg" id="gateMsg" role="status"></p>
       <aside class="byline">
         <img class="byline-ph" src="img/author.jpg" alt="Кирилл Минкин">
@@ -1682,6 +1692,24 @@ drawRuler();
   const gate=document.getElementById('gate'), msg=document.getElementById('gateMsg');
   const get=k=>{try{return localStorage.getItem(k)}catch(e){return null}}, set=(k,v)=>{try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch(e){}};
   document.getElementById('gateGo').href='https://t.me/'+BOT+'?start=game';
+  /* --- вход по коду для близких коллег: в странице лежит только хеш (PBKDF2), сам код не хранится --- */
+  const KC='knigoskop_code', CODE_SALT='9eea2a467988481a', CODE_HASH='a8ae23946ae89f4ef3bda0c291a78945091d5d76f27c7cc48dd06fa4ba24a0c6';
+  const codeForm=document.getElementById('codeForm'), codeInput=document.getElementById('codeInput');
+  document.getElementById('codeToggle').onclick=()=>{codeForm.hidden=!codeForm.hidden;if(!codeForm.hidden)codeInput.focus();};
+  const hex=b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
+  codeForm.onsubmit=async e=>{
+    e.preventDefault();
+    const c=codeInput.value.replace(/[^A-Za-z0-9]/g,'').toUpperCase(); if(!c) return;
+    if(!(window.crypto&&crypto.subtle)){show('В этом браузере вход по коду недоступен. Откройте игру в современном браузере.');return;}
+    show('Проверяю код…','wait');
+    try{
+      const enc=new TextEncoder(), key=await crypto.subtle.importKey('raw',enc.encode(c),'PBKDF2',false,['deriveBits']);
+      const bits=await crypto.subtle.deriveBits({name:'PBKDF2',hash:'SHA-256',salt:enc.encode(CODE_SALT),iterations:150000},key,256);
+      if(hex(bits)===CODE_HASH){set(KC,CODE_HASH);gate.hidden=true;return;}
+    }catch(err){}
+    codeInput.select(); show('Код не подходит. Проверьте и попробуйте ещё раз.');
+  };
+  if(get(KC)===CODE_HASH){gate.hidden=true;return;}
   const m=location.hash.match(/access=([\w.-]+)/);
   if(m){set(KT,m[1]);set(KV,null);history.replaceState(null,'',location.pathname+location.search);}
   const t=get(KT), last=+get(KV)||0;
