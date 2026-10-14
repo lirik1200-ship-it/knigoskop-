@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><title>seal</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&display=swap" rel="stylesheet">
+<style>html,body{margin:0;background:transparent}body{display:flex;gap:40px;padding:0}#box{width:512px;height:512px}</style>
+</head><body><div id="box"></div>
+<script>
+const R=n=>Math.round(n*100)/100;
+function leaf(x,y,ang,len,w){return `<path transform="translate(${R(x)} ${R(y)}) rotate(${R(ang)})" d="M0 0 C${R(len*.3)} ${R(-w)} ${R(len*.75)} ${R(-w*.8)} ${R(len)} 0 C${R(len*.75)} ${R(w*.8)} ${R(len*.3)} ${R(w)} 0 0Z"/>`;}
+function sprig(cx,cy,r,a0,a1,n,L,W,stemW){
+  const rad=d=>d*Math.PI/180,p=a=>[cx+r*Math.cos(rad(a)),cy+r*Math.sin(rad(a))];
+  const [x0,y0]=p(a0),[x1,y1]=p(a1),large=Math.abs(a1-a0)>180?1:0,sweep=a1>a0?1:0,dir=a1>a0?1:-1;
+  let o=`<path d="M${R(x0)} ${R(y0)} A${r} ${r} 0 ${large} ${sweep} ${R(x1)} ${R(y1)}" fill="none" stroke-width="${stemW}" stroke-linecap="round"/>`;
+  for(let i=0;i<n;i++){const t=(i+.6)/n,a=a0+(a1-a0)*t,[x,y]=p(a),tang=a+90*dir,s=1-.4*t;o+=leaf(x,y,tang-38,L*s,W*s)+leaf(x,y,tang+38,L*s,W*s);}
+  const [tx,ty]=p(a1); return o+leaf(tx,ty,a1+90*dir,L*.55,W*.55);
+}
+function blob(cx,cy,R0){let d='';const N=220;for(let i=0;i<=N;i++){const th=i/N*2*Math.PI;
+  const r=R0+2.6*Math.sin(7*th+.4)+1.5*Math.sin(13*th+1.1)+.9*Math.sin(23*th+.2)+10*Math.exp(-Math.pow((th-1.0)/.2,2))+6*Math.exp(-Math.pow((th-1.42)/.13,2));
+  d+=(i?'L':'M')+R(cx+r*Math.cos(th))+' '+R(cy+r*Math.sin(th));}return d+'Z';}
+const B=blob(100,98,82);
+const wreath=sprig(100,98,55,114,246,7,11.5,3.8,1.4)+sprig(100,98,55,66,-66,7,11.5,3.8,1.4);
+const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="512" height="512">
+<defs>
+  <radialGradient id="body" cx="38%" cy="32%" r="78%">
+    <stop offset="0" stop-color="#c2382f"/><stop offset=".42" stop-color="#9a221c"/><stop offset=".8" stop-color="#7a1713"/><stop offset="1" stop-color="#4f0c09"/>
+  </radialGradient>
+  <radialGradient id="well" cx="56%" cy="60%" r="62%">
+    <stop offset="0" stop-color="#a1261f"/><stop offset=".7" stop-color="#8a1c17"/><stop offset="1" stop-color="#5e0f0b"/>
+  </radialGradient>
+  <linearGradient id="rimL" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5a0d0a" stop-opacity=".9"/><stop offset=".55" stop-color="#5a0d0a" stop-opacity="0"/><stop offset="1" stop-color="#ffb3a3" stop-opacity=".55"/></linearGradient>
+  <filter id="drop" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="3.2" stdDeviation="3.4" flood-color="#2a0605" flood-opacity=".45"/></filter>
+  <filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="1.6" numOctaves="2" seed="7"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .22 0"/><feComposite in2="SourceGraphic" operator="in"/></filter>
+  <filter id="emboss" x="-10%" y="-10%" width="120%" height="120%">
+    <feGaussianBlur in="SourceAlpha" stdDeviation=".7" result="b"/>
+    <feOffset in="b" dx=".9" dy="1.3" result="o1"/><feFlood flood-color="#3a0706" flood-opacity=".85"/><feComposite in2="o1" operator="in" result="sh"/>
+    <feOffset in="b" dx="-.6" dy="-.8" result="o2"/><feFlood flood-color="#ffd9cf" flood-opacity=".55"/><feComposite in2="o2" operator="in" result="hl"/>
+    <feMerge><feMergeNode in="sh"/><feMergeNode in="hl"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <clipPath id="clip"><path d="${B}"/></clipPath>
+</defs>
+<g filter="url(#drop)"><path d="${B}" fill="url(#body)"/></g>
+<g clip-path="url(#clip)">
+  <path d="${B}" fill="none" stroke="url(#rimL)" stroke-width="7"/>
+  <rect width="200" height="200" fill="#000" filter="url(#grain)" opacity=".7"/>
+  <!-- оттиск: утопленная площадка без контура -->
+  <circle cx="100" cy="98" r="66" fill="url(#well)"/>
+  <circle cx="100" cy="98" r="66" fill="none" stroke="#4a0a08" stroke-opacity=".35" stroke-width="3.6" transform="translate(-.9 -1.2)"/>
+  <circle cx="100" cy="98" r="66" fill="none" stroke="#e57a6c" stroke-opacity=".22" stroke-width="1.4" transform="translate(1 1.4)"/>
+  <!-- блики на валике -->
+  <path d="M38 64 C48 42 70 28 94 25" fill="none" stroke="#fff" stroke-opacity=".38" stroke-width="3.2" stroke-linecap="round"/>
+  <path d="M33 86 C33 80 35 74 37 70" fill="none" stroke="#fff" stroke-opacity=".25" stroke-width="2" stroke-linecap="round"/>
+  <ellipse cx="62" cy="40" rx="7" ry="3" transform="rotate(-32 62 40)" fill="#fff" opacity=".35"/>
+  <path d="M166 120 C160 146 140 166 112 172" fill="none" stroke="#2c0504" stroke-opacity=".35" stroke-width="4" stroke-linecap="round"/>
+</g>
+<g filter="url(#emboss)">
+  <g fill="#f4e4dc" stroke="#f4e4dc">${wreath}</g>
+  <text x="100" y="131" text-anchor="middle" font-family="Playfair Display" font-weight="900" font-size="94" fill="#f4e4dc">К</text>
+</g>
+</svg>`;
+document.getElementById('box').innerHTML=svg;
+window.SVG=svg;
+</script></body></html>

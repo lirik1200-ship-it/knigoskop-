@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><title>Книгоскопъ — знак</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#111010;--paper:#f6f1e7;--wax:#8e1b17;--waxd:#5c0f0c;}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--ink)}
+body{width:2400px;font-family:"Source Serif 4",serif;
+  background:radial-gradient(1400px 900px at 20% 0,#fbf8f1 0,transparent 70%),repeating-linear-gradient(90deg,rgba(0,0,0,.012) 0 1px,transparent 1px 4px),var(--paper)}
+.sheet{padding:110px 130px 120px}
+.top{display:grid;grid-template-columns:1fr auto;align-items:end;border-bottom:1px solid var(--ink);padding-bottom:26px}
+.top h1{font-family:"Playfair Display";font-weight:400;font-size:84px;letter-spacing:-1.5px;margin:0;line-height:1}
+.top h1 i{color:var(--wax)}
+.top .m{font-family:Inter;font-size:13px;font-weight:700;letter-spacing:.32em;text-transform:uppercase;text-align:right;line-height:2}
+.row{display:grid;grid-template-columns:120px 470px 1fr;gap:0;border-bottom:1px solid rgba(17,16,16,.35);padding:64px 0}
+.no{font-family:"Playfair Display";font-size:64px;line-height:.9;font-weight:400}
+.no small{display:block;font-family:Inter;font-size:11px;font-weight:700;letter-spacing:.3em;margin-top:14px}
+.hero{width:420px;height:420px;display:flex;align-items:center;justify-content:center}
+.side{display:grid;grid-template-rows:auto auto auto;gap:34px}
+.name{font-family:"Playfair Display";font-size:40px;font-weight:400;margin:0;letter-spacing:-.4px}
+.name em{font-family:"Source Serif 4";font-size:20px;font-style:italic;color:#555;display:block;margin-top:8px;letter-spacing:0;max-width:880px;line-height:1.4}
+.var{display:flex;gap:26px;align-items:center}
+.tile{width:170px;height:170px;display:flex;align-items:center;justify-content:center;outline:1px solid rgba(17,16,16,.25)}
+.tile.dk{background:var(--ink)}
+.tile.wx{background:#fff}
+.icons{display:flex;gap:22px;align-items:flex-end;margin-left:18px}
+.ic{display:flex;flex-direction:column;align-items:center;gap:8px;font-family:Inter;font-size:10px;font-weight:700;letter-spacing:.2em;color:#666}
+.ic span.b{display:flex;align-items:center;justify-content:center;background:#fff;outline:1px solid rgba(17,16,16,.25)}
+.lock{display:flex;align-items:center;gap:30px;padding:22px 34px;background:#fff;outline:1px solid rgba(17,16,16,.2);width:max-content}
+.wm{font-family:"Playfair Display";font-weight:500;font-size:64px;letter-spacing:-.6px;line-height:1}
+.wm i{font-style:italic;font-weight:400}
+.tag{font-family:Inter;font-weight:700;font-size:11px;letter-spacing:.38em;text-transform:uppercase;margin-top:12px;color:#444}
+.foot{display:flex;justify-content:space-between;margin-top:46px;font-family:Inter;font-size:11px;font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:#666}
+</style></head>
+<body><div class="sheet">
+<div class="top"><h1>Сургуч <i>и</i> линза</h1><div class="m">Книгоскопъ · знак<br>четыре концепции · лист I</div></div>
+<div id="rows"></div>
+<div class="foot"><span>Чернила · бумага · сургуч #8e1b17</span><span>Проверка: 420 · 170 · 64 · 32 · 16 px</span></div>
+</div>
+<script>
+const R=(n)=>Math.round(n*100)/100;
+// pointed leaf, base at origin, pointing along +x
+function leaf(x,y,ang,len,w){
+  return `<path transform="translate(${R(x)} ${R(y)}) rotate(${R(ang)})" d="M0 0 C${R(len*.3)} ${R(-w)} ${R(len*.75)} ${R(-w*.8)} ${R(len)} 0 C${R(len*.75)} ${R(w*.8)} ${R(len*.3)} ${R(w)} 0 0Z"/>`;
+}
+// sprig along circular arc from a0 to a1 (degrees), leaves on both sides, shrinking to tip
+function sprig(cx,cy,r,a0,a1,n,L,W,col,stemW){
+  const rad=d=>d*Math.PI/180; let out='';
+  const p=a=>[cx+r*Math.cos(rad(a)),cy+r*Math.sin(rad(a))];
+  const [x0,y0]=p(a0),[x1,y1]=p(a1); const large=Math.abs(a1-a0)>180?1:0, sweep=a1>a0?1:0;
+  out+=`<path d="M${R(x0)} ${R(y0)} A${r} ${r} 0 ${large} ${sweep} ${R(x1)} ${R(y1)}" fill="none" stroke="${col}" stroke-width="${stemW}" stroke-linecap="round"/>`;
+  out+=`<g fill="${col}">`;
+  for(let i=0;i<n;i++){
+    const t=(i+.6)/n, a=a0+(a1-a0)*t, [x,y]=p(a), dir=a1>a0?1:-1;
+    const tang=a+90*dir, s=1-.42*t, len=L*s, w=W*s;
+    out+=leaf(x,y,tang-38,len,w)+leaf(x,y,tang+38,len,w);
+  }
+  const [tx,ty]=p(a1); out+=leaf(tx,ty,a1+90*(a1>a0?1:-1),L*.55,W*.55);
+  return out+'</g>';
+}
+/* ---------- I · Око-книга ---------- */
+function markEye(ink,paper,o={}){
+  const ring=o.small?'':`<ellipse cx="100" cy="100" rx="75" ry="88" fill="none" stroke="${ink}" stroke-width="1" stroke-dasharray="1.2 3.4"/>`;
+  let pages='';
+  [62,69,76,83].forEach((cy,i)=>{pages+=`<path d="M34 106 C70 ${cy} 130 ${cy} 166 106" fill="none" stroke="${ink}" stroke-width="${i==0?5.2:1.5}" stroke-linecap="round"/>`});
+  return `<ellipse cx="100" cy="100" rx="83" ry="96" fill="none" stroke="${ink}" stroke-width="4"/>${ring}
+  ${pages}
+  <path d="M34 106 C66 140 134 140 166 106" fill="none" stroke="${ink}" stroke-width="5.2" stroke-linecap="round"/>
+  <path d="M100 128 V136" stroke="${ink}" stroke-width="2.2"/>
+  <circle cx="100" cy="103" r="24" fill="${ink}" stroke="${paper}" stroke-width="4"/>
+  <circle cx="100" cy="103" r="14.5" fill="none" stroke="${paper}" stroke-width="1.3" opacity=".9"/>
+  <circle cx="92" cy="95" r="4.2" fill="${paper}"/><circle cx="106.5" cy="110" r="1.6" fill="${paper}" opacity=".8"/>
+  ${o.small?'':sprig(100,108,62,96,148,5,13,4.3,ink,1.6)+sprig(100,108,62,84,32,5,13,4.3,ink,1.6)}
+  <path d="M100 22 l4 7 -4 7 -4 -7z" fill="${o.accent||ink}"/>`;
+}
+/* ---------- II · Сургучная печать ---------- */
+function blobPath(cx,cy,R0){
+  let d=''; const N=180;
+  for(let i=0;i<=N;i++){const th=i/N*2*Math.PI;
+    let r=R0+2.6*Math.sin(7*th+.4)+1.5*Math.sin(13*th+1.1)+.9*Math.sin(23*th+.2)+10*Math.exp(-Math.pow((th-1.0)/.2,2))+6*Math.exp(-Math.pow((th-1.42)/.13,2));
+    d+=(i?'L':'M')+R(cx+r*Math.cos(th))+' '+R(cy+r*Math.sin(th));}
+  return d+'Z';
+}
+function markSeal(fill,mark,shadow,o={}){
+  const wreath=o.small?'':sprig(100,100,56,112,250,7,11,3.6,mark,1.3)+sprig(100,100,56,68,-70,7,11,3.6,mark,1.3);
+  return `<path d="${blobPath(100,100,84)}" fill="${fill}"/>
+  <circle cx="100" cy="100" r="70" fill="none" stroke="${shadow}" stroke-width="2.2" opacity=".55"/>
+  <circle cx="100" cy="100" r="69" fill="none" stroke="${mark}" stroke-width="1.6"/>
+  ${wreath}
+  <text x="97.5" y="132.5" text-anchor="middle" font-family="Playfair Display" font-weight="900" font-size="${o.small?100:82}" fill="${shadow}" opacity=".6">К</text>
+  <text x="96" y="131" text-anchor="middle" font-family="Playfair Display" font-weight="900" font-size="${o.small?100:82}" fill="${mark}">К</text>
+  ${o.small?'':`<text x="126" y="131" text-anchor="middle" font-family="Playfair Display" font-style="italic" font-weight="700" font-size="34" fill="${mark}">ъ</text><path d="M96 31 l3.6 6.4 -3.6 6.4 -3.6 -6.4z" fill="${mark}" transform="translate(4 0)"/>`}`;
+}
+/* ---------- III · Къ с пером ---------- */
+function markQuill(ink,paper,accent,o={}){
+  let barbs=''; for(let i=0;i<16;i++){const t=(i+1)/17, x=133+t*55*(0.6+0.4*t), y=163-t*150; barbs+=`<path d="M${R(x)} ${R(y)} l${R(5-2*t)} ${R(4-2*t)}" stroke="${paper}" stroke-width=".7" opacity=".85"/>`;}
+  return `<ellipse cx="96" cy="104" rx="74" ry="92" fill="none" stroke="${ink}" stroke-width="3.4"/>
+  ${o.small?'':`<ellipse cx="96" cy="104" rx="67" ry="85" fill="none" stroke="${ink}" stroke-width=".9"/>`}
+
+  <text x="84" y="150" text-anchor="middle" font-family="Playfair Display" font-weight="900" font-size="128" fill="${ink}">К</text>
+  <path d="M128 162 C140 118 158 62 190 10 C172 70 154 122 138 164 Z" fill="${accent}"/>
+  <path d="M133 163 C148 116 166 64 188 14" fill="none" stroke="${paper}" stroke-width="1.4"/>
+  ${o.small?'':barbs}
+  <path d="M126 160 l3 14 5 -12z" fill="${ink}"/>`;
+}
+/* ---------- IV · Закладка-линза ---------- */
+function markRibbon(ink,paper,accent,o={}){
+  return `<path d="M18 112 C52 92 82 94 100 110 C118 94 148 92 182 112" fill="none" stroke="${ink}" stroke-width="5" stroke-linecap="round"/>
+  <path d="M21 121 C54 102 82 104 100 119 C118 104 146 102 179 121" fill="none" stroke="${ink}" stroke-width="1.6"/><path d="M23 127 C55 109 82 111 100 125 C118 111 145 109 177 127" fill="none" stroke="${ink}" stroke-width="1.2"/>
+  <path d="M24 131 C56 114 82 116 100 130 C118 116 144 114 176 131 L176 140 C146 124 118 126 100 140 C82 126 54 124 24 140Z" fill="${ink}"/>
+  <path d="M74 8 H126 V190 L100 168 L74 190Z" fill="${accent}"/>
+  <circle cx="100" cy="64" r="21" fill="none" stroke="${paper}" stroke-width="4.2"/>
+  <circle cx="100" cy="64" r="8.5" fill="${paper}"/>
+  <path d="M88 55 A14 14 0 0 1 99 49" fill="none" stroke="${paper}" stroke-width="2" stroke-linecap="round"/>
+  ${o.small?'':`<text x="100" y="152" text-anchor="middle" font-family="Playfair Display" font-weight="700" font-size="30" fill="${paper}">Къ</text><path d="M86 108 h28" stroke="${paper}" stroke-width="1"/><path d="M92 101 h16" stroke="${paper}" stroke-width="1"/>`}`;
+}
+const C={ink:'#111010',paper:'#f6f1e7',wax:'#8e1b17',waxd:'#5c0f0c',white:'#ffffff'};
+const concepts=[
+ {n:'I',t:'Око-книга',d:'Страницы раскрытой книги складываются в глаз, зрачок — линза. «Смотреть в книгу» без слов. Овал и лавр остаются от экслибриса, но знак собран вокруг одного силуэта.',
+  big:()=>markEye(C.ink,C.paper,{accent:C.wax}), wax:()=>markEye(C.wax,'#fff'), neg:()=>markEye(C.paper,C.ink,{accent:C.wax}), small:()=>markEye(C.ink,'#fff',{small:1,accent:C.wax})},
+ {n:'II',t:'Сургучная печать',d:'Капля сургуча с оттиском «Къ» и лавровым венком. Как печать, которой запечатывали письмо. Кнопки игры уже называются seal-btn — знак сам становится кнопкой. Иконка: красная капля с белой «К».',
+  big:()=>markSeal(C.wax,C.paper,C.waxd), wax:()=>markSeal(C.ink,C.paper,'#000'), neg:()=>markSeal(C.paper,C.ink,'#cbbfae'), small:()=>markSeal(C.wax,'#fff',C.waxd,{small:1})},
+ {n:'III',t:'Къ и перо',d:'Тяжёлая литера «К», к которой вместо твёрдого знака приставлено гусиное перо. Оно выходит за овал рамки, как росчерк за поля. Самый динамичный вариант.',
+  big:()=>markQuill(C.ink,C.paper,C.wax), wax:()=>markQuill(C.wax,'#fff',C.wax), neg:()=>markQuill(C.paper,C.ink,C.wax), small:()=>markQuill(C.ink,'#fff',C.wax,{small:1})},
+ {n:'IV',t:'Закладка-линза',d:'Сургучная закладка свисает из раскрытой книги, в её верхней части линза окуляра. Вертикальный знак, хорош как иконка приложения и как флажок в углу экрана.',
+  big:()=>markRibbon(C.ink,C.paper,C.wax), wax:()=>markRibbon(C.wax,'#fff',C.wax), neg:()=>markRibbon(C.paper,C.ink,C.wax), small:()=>markRibbon(C.ink,'#fff',C.wax,{small:1})},
+];
+const svg=(inner,s,bg)=>`<svg width="${s}" height="${s}" viewBox="0 0 200 200">${bg?`<rect width="200" height="200" fill="${bg}"/>`:''}${inner}</svg>`;
+let html='';
+for(const c of concepts){
+  html+=`<div class="row"><div class="no">${c.n}<small>концепция</small></div>
+  <div class="hero">${svg(c.big(),400)}</div>
+  <div class="side"><h2 class="name">${c.t}<em>${c.d}</em></h2>
+   <div class="var"><div class="tile wx">${svg(c.wax(),140)}</div><div class="tile dk">${svg(c.neg(),140)}</div>
+    <div class="icons"><div class="ic"><span class="b" style="width:72px;height:72px">${svg(c.small(),64)}</span>64</div><div class="ic"><span class="b" style="width:40px;height:40px">${svg(c.small(),32)}</span>32</div><div class="ic"><span class="b" style="width:22px;height:22px">${svg(c.small(),16)}</span>16</div></div></div>
+   <div class="lock">${svg(c.big(),96)}<div><div class="wm">Книгоскоп<i>ъ</i></div><div class="tag">Сцены из русской литературы</div></div></div>
+  </div></div>`;
+}
+document.getElementById('rows').innerHTML=html;
+</script>
+</body></html>

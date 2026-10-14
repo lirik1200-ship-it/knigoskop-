@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="Книгоскопъ — игра по русской литературе: узнайте произведение по сцене.">
 <meta name="theme-color" content="#000000">
-<link rel="icon" href="img/emblem.png">
+<link rel="icon" href="img/favicon.png">
 <style>[hidden]{display:none!important}body{margin:0}
 /* ---------- grade picker ---------- */
 .grade-row{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));width:100%;border:1px solid var(--ink);margin-top:calc(-1 * var(--s-sm));}
@@ -433,6 +433,106 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:2px so
 .fin-teams span+span{border-left:1px solid var(--ink);}
 .fin-teams .w{background:var(--ink);color:var(--canvas);font-weight:700;}
 .turn{font-family:var(--ui);}
+
+/* ===================== v2: режимы, двери, кабинет учителя, слайд, герои ===================== */
+:root{--sealwax:#8e1b17;}
+img[src$="emblem.png"]{filter:none!important;}
+.step{display:flex;flex-direction:column;gap:var(--s-xl);}
+.step>*{animation:up .45s var(--ease-in) both;}
+.step>*:nth-child(2){animation-delay:70ms}.step>*:nth-child(3){animation-delay:140ms}.step>*:nth-child(4){animation-delay:210ms}.step>*:nth-child(5){animation-delay:280ms}.step>*:nth-child(n+6){animation-delay:350ms}
+.brand{display:flex;align-items:center;gap:var(--s-lg);}
+.cover .brand img{width:88px;height:88px;flex:none;margin:0;}
+.brand h1{margin:0!important;font-size:clamp(40px,11.4vw,64px)!important;}
+.cover .mode-card img{filter:none!important;}
+.hub-tab,.hub-tab>*{animation:none!important;}
+.kicker{margin:0;font-family:var(--ui);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);}
+.step-h{margin:-12px 0 0;padding-bottom:var(--s-md);border-bottom:1px solid var(--ink);font-family:var(--display);font-weight:400;font-size:clamp(34px,9vw,46px);line-height:1.02;letter-spacing:-.5px;color:var(--ink);}
+.step-sub{margin:-10px 0 0;font-family:var(--serif);font-style:italic;font-size:16px;color:var(--body);}
+.back-link{align-self:flex-start;font-family:var(--ui);font-size:13px;font-weight:700;color:var(--ink);text-decoration:underline;text-underline-offset:3px;}
+.mode-card{position:relative;display:block;width:100%;height:clamp(200px,50vw,250px);text-align:left;border:1px solid var(--ink);background:#000;color:#fff;overflow:hidden;}
+.cover .mode-card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.8;margin:0;transition:transform 1.2s var(--ease-in),opacity .3s;}
+.mode-card:hover img{transform:scale(1.05);opacity:.92;}
+.mode-card::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 30%,rgba(0,0,0,.86));}
+.mode-card .in{position:absolute;left:18px;right:18px;bottom:16px;z-index:1;}
+.mode-card .t{display:block;font-family:var(--display);font-size:32px;line-height:1;letter-spacing:-.4px;}
+.mode-card .d{display:block;margin-top:6px;font-family:var(--serif);font-style:italic;font-size:15px;line-height:1.3;opacity:.92;}
+.mode-card .tag{position:absolute;top:14px;left:14px;z-index:1;padding:5px 8px;background:#fff;color:#000;font-family:var(--ui);font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;}
+.mode-card .tag.new{background:var(--sealwax);color:#fff;}
+.mode-card .num{position:absolute;top:8px;right:16px;z-index:1;font-family:var(--display);font-size:46px;line-height:1;}
+.doors{display:flex;flex-direction:column;}
+.door{display:grid;grid-template-columns:64px 1fr 20px;align-items:center;gap:14px;width:100%;text-align:left;padding:18px 0;border-bottom:1px solid var(--hairline);}
+.door .ic{width:64px;height:64px;border:1px solid var(--ink);display:flex;align-items:center;justify-content:center;transition:background .2s,color .2s;}
+.door:hover .ic{background:var(--ink);color:var(--canvas);}
+.door .ic svg{width:34px;height:34px;}
+.door .t{display:block;font-family:var(--display);font-size:28px;line-height:1;color:var(--ink);}
+.door .d{display:block;margin-top:4px;font-family:var(--serif);font-size:15px;line-height:1.35;color:var(--body);}
+.door .ar{font-family:var(--display);font-size:26px;}
+.code-row{display:flex;border:1px solid var(--ink);margin-top:calc(-1 * var(--s-sm));}
+.code-row input{flex:1;min-width:0;border:0;border-radius:0;padding:12px 14px;background:var(--canvas);color:var(--ink);font-family:var(--ui);font-size:16px;letter-spacing:.3em;text-transform:uppercase;}
+.code-row input:focus{outline:none;box-shadow:inset 0 0 0 1px var(--ink);}
+.code-row button{padding:0 18px;border-left:1px solid var(--ink);font-family:var(--ui);font-weight:700;font-size:14px;}
+.code-row button:hover{background:var(--ink);color:var(--canvas);}
+.step .msg{margin-top:calc(-1 * var(--s-md));}
+.rules{border-top:1px solid var(--ink);border-bottom:1px solid var(--hairline);}
+.rules summary{cursor:pointer;list-style:none;padding:12px 0;font-family:var(--ui);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);}
+.rules summary::-webkit-details-marker{display:none;}
+.rules summary::after{content:"  +";}
+.rules[open] summary::after{content:"  −";}
+.rules ol,.rules .score-line{margin-bottom:var(--s-md);}
+/* классы: квадрат-галочка и сплошная заливка */
+.grade-row{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:8px;border:0!important;}
+.grade-row button{position:relative;min-height:74px;padding:10px 10px 8px!important;border:1.5px solid var(--ink)!important;text-align:left;font-size:30px!important;}
+.grade-row button .box{position:absolute;top:8px;right:8px;width:20px;height:20px;box-sizing:border-box;border:1.5px solid var(--ink);background:var(--canvas);display:flex;align-items:center;justify-content:center;}
+.grade-row button[aria-pressed="true"] .box{border-color:var(--canvas);}
+.grade-row button[aria-pressed="true"] .box::after{content:"";width:10px;height:5px;border-left:2.5px solid var(--ink);border-bottom:2.5px solid var(--ink);transform:rotate(-45deg) translate(1px,-1px);}
+.grade-row button:disabled{border-style:dashed!important;background:var(--canvas)!important;}
+.grade-row button:disabled .box{border-color:#cfcfcf;}
+.grade-sum{display:flex;align-items:center;gap:8px;margin-top:calc(-1 * var(--s-sm));font-family:var(--ui);font-size:14px;color:var(--ink);}
+.grade-sum b{padding:3px 8px;background:var(--ink);color:var(--canvas);font-variant-numeric:tabular-nums;}
+.count-row button[aria-pressed="true"]{background:var(--ink);color:var(--canvas);}
+.count-row button[aria-pressed="true"] small{color:#bdbdbd;}
+.go-btn{display:flex;align-items:center;justify-content:space-between;width:100%;padding:18px 20px;border:1px solid var(--ink);background:var(--ink);color:var(--canvas);font-family:var(--ui);font-weight:700;font-size:17px;transition:background .2s,border-color .2s;}
+.go-btn .arr{font-family:var(--display);font-size:24px;line-height:1;}
+.go-btn:hover{background:var(--sealwax);border-color:var(--sealwax);}
+/* кабинет учителя */
+.hub-tabs{display:flex;position:sticky;top:0;z-index:3;background:var(--canvas);border-bottom:1px solid var(--ink);}
+.hub-tabs button{flex:1;padding:14px 0;margin-bottom:-1px;border-bottom:3px solid transparent;font-family:var(--ui);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--body);}
+.hub-tabs button.on{color:var(--ink);border-bottom-color:var(--ink);}
+.hub-tab{display:flex;flex-direction:column;gap:var(--s-md);}
+.hub-tab[hidden]{display:none!important;}
+.seg{display:grid;grid-template-columns:1fr 1fr;border:1.5px solid var(--ink);}
+.seg button{padding:12px;font-family:var(--display);font-size:22px;line-height:1;}
+.seg button+button{border-left:1.5px solid var(--ink);}
+.seg button small{display:block;margin-top:5px;font-family:var(--ui);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--body);}
+.seg button.on{background:var(--ink);color:var(--canvas);}
+.seg button.on small{color:#bdbdbd;}
+.ts-grade label{display:grid!important;grid-template-columns:22px 64px 1fr;gap:12px!important;align-items:center!important;}
+.ts-grade label img{width:64px;height:40px;object-fit:cover;display:block;transition:filter .2s,opacity .2s;}
+.ts-grade label:has(input:not(:checked)) img{filter:grayscale(1);opacity:.55;}
+.ts-grade input{appearance:none;-webkit-appearance:none;width:22px!important;height:22px!important;margin:0!important;box-sizing:border-box;border:1.5px solid var(--ink);border-radius:0;background:var(--canvas);display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.ts-grade input:checked{background:var(--ink);}
+.ts-grade input:checked::after{content:"";width:10px;height:5px;border-left:2.5px solid var(--canvas);border-bottom:2.5px solid var(--canvas);transform:rotate(-45deg) translate(1px,-1px);}
+.kbd-list{margin:0;padding-left:18px;font-family:var(--ui);font-size:14px;line-height:2;color:var(--ink-soft);}
+.kbd-list kbd{padding:1px 6px;border:1px solid var(--ink);font-family:var(--ui);font-size:12px;}
+/* командная игра на слайде */
+.pbar{position:absolute;left:0;right:0;bottom:0;z-index:5;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;padding:12px 18px calc(12px + env(safe-area-inset-bottom,0px));background:rgba(10,10,10,.93);color:#fff;border-top:1px solid #333;}
+.pteam{display:flex;align-items:center;gap:12px;min-width:0;}
+.pteam.r{justify-content:flex-end;}
+.pteam .nm{max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--ui);font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#aaa;}
+.pteam.turn .nm{color:#fff;}
+.pteam.turn .nm::before{content:"● ";color:#e0453c;}
+.pteam .pts{min-width:56px;text-align:center;font-family:var(--display);font-size:46px;line-height:1;font-variant-numeric:tabular-nums;}
+.pteam .bt{display:flex;gap:6px;}
+.pbar button{padding:9px 12px;border:1px solid #fff;color:#fff;font-family:var(--ui);font-weight:700;font-size:14px;}
+.pbar button:hover{background:#fff;color:#000;}
+.pmid{display:flex;gap:8px;}
+.pmid .prime{background:#fff;color:#000;}
+.pexit{position:absolute;top:calc(var(--mast) + 10px);left:12px;z-index:6;padding:6px 10px;border:1px solid #fff;background:rgba(0,0,0,.7);color:#fff;font-family:var(--ui);font-weight:700;font-size:12px;}
+body.present .dock{display:none!important;}
+body.present .rail{bottom:96px;}
+body.present #resTiles,body.present .legend,body.present .rrow .p{display:none!important;}
+.spot.shown{outline:2px dashed #fff;box-shadow:0 0 0 2px rgba(0,0,0,.45),inset 0 0 0 9999px rgba(255,255,255,.1);}
+@media (max-width:760px){.pbar{grid-template-columns:1fr 1fr;gap:10px;}.pmid{grid-column:1 / -1;order:3;justify-content:center;flex-wrap:wrap;}.pteam .pts{font-size:34px;min-width:40px;}.pteam .nm{max-width:90px;}}
 </style>
 
 <div id="app">
@@ -463,7 +563,7 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:2px so
     <div class="dock-in">
       <button class="dock-tab" id="dockTab" aria-expanded="true">▾ свернуть панель</button>
       <div class="chips">
-        <button class="chip" id="chipPlace" data-open="sheetMap"><span class="c-lab">Место</span><span class="c-val" id="valPlace">отметить на карте</span></button>
+        <button class="chip" id="chipPlace" data-open="sheetMap"><span class="c-lab" id="labPlace">Место</span><span class="c-val" id="valPlace">отметить на карте</span></button>
         <button class="chip" id="chipAuthor" data-open="sheetAuthor"><span class="c-lab">Автор</span><span class="c-val" id="valAuthor">узнать по портрету</span></button>
         <button class="chip" id="chipTitle" data-open="sheetTitle"><span class="c-lab">Название</span><span class="c-val" id="valTitle">вписать</span></button>
       </div>
@@ -479,6 +579,13 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:2px so
       <button class="seal-btn" id="btnAnswer">Дать ответ</button>
     </div>
   </section>
+
+  <div class="pbar" id="pbar" hidden>
+    <div class="pteam" id="pt0"><span class="nm" id="pn0"></span><span class="pts" id="pp0">0</span><span class="bt"><button data-pa="0,-1">−</button><button data-pa="0,1">+1</button><button data-pa="0,3">+3</button></span></div>
+    <div class="pmid"><button id="pDet">Деталь</button><button class="prime" id="pAns">Показать ответ</button><button id="pNx">Дальше →</button></div>
+    <div class="pteam r" id="pt1"><span class="bt"><button data-pa="1,-1">−</button><button data-pa="1,1">+1</button><button data-pa="1,3">+3</button></span><span class="pts" id="pp1">0</span><span class="nm" id="pn1"></span></div>
+  </div>
+  <button class="pexit" id="pexit" hidden>✕ Выйти</button>
 
   <div class="sheet" id="sheetMap" hidden role="dialog" aria-label="Карта"><div class="sheet-page">
     <div class="sheet-head"><h2>Где происходит действие?</h2><button class="close-x" data-close aria-label="Свернуть"><svg viewBox="0 0 14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 2l10 10M12 2L2 12"/></svg></button></div>
@@ -512,6 +619,15 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:2px so
     <div class="sheet-foot"><button data-close>Готово</button></div>
   </div></div>
 
+  <div class="sheet" id="sheetHero" hidden role="dialog" aria-label="Герой"><div class="sheet-page">
+    <div class="sheet-head"><h2>Кто этот герой?</h2><button class="close-x" data-close aria-label="Свернуть"><svg viewBox="0 0 14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 2l10 10M12 2L2 12"/></svg></button></div>
+    <div class="sheet-body">
+      <input class="txt-in" id="heroInput" autocomplete="off" placeholder="имя героя">
+      <p class="note">Достаточно имени или фамилии, как героя называют в книге. Мелкие опечатки игра простит.</p>
+    </div>
+    <div class="sheet-foot"><button data-close>Готово</button></div>
+  </div></div>
+
   <div class="sheet" id="sheetHelp" hidden role="dialog" aria-label="Правила"><div class="sheet-page">
     <div class="sheet-head"><h2>Как играть</h2><button class="close-x" data-close aria-label="Свернуть"><svg viewBox="0 0 14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 2l10 10M12 2L2 12"/></svg></button></div>
     <div class="sheet-body">
@@ -522,6 +638,7 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:2px so
         <li><b>1 000</b>Автор: по портрету, подписи можно включить.</li>
         <li><b>1 500</b>Название: вписывается вручную.</li>
       </ul>
+      <p class="note">В режиме «Угадай героя» вместо места вписывается имя героя — до 1 500 очков. Вещи на картинке открывают косвенные подсказки.</p>
       <p class="note">В некоторых сценах спрятаны детали из текста. Они никак не подсвечены: нажмите на предмет, который кажется вам важным, и, если он из книги, откроется цитата. Очков за это не дают.</p>
     </div>
     <div class="sheet-foot"><button data-close>Понятно</button></div>
@@ -564,50 +681,106 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:2px so
 
   <div class="intro" id="intro">
     <div class="cover">
-      <img src="img/emblem.png" alt="">
-      <h1>Книгоскопъ</h1>
-      <p class="sub">сцены из русской литературы</p>
-      <ol>
-        <li><span><b>Осмотритесь.</b> Тяните сцену пальцем или мышью: она поворачивается по кругу. Кнопки «+» и «−», колёсико мыши или щипок приближают и отдаляют картинку.</span></li>
-        <li><span><b>Ищите детали.</b> Нажмите на предмет, который кажется важным: если он из текста, откроется цитата. Детали не подсвечены.</span></li>
-        <li><span><b>Направление.</b> Сдвиньте шкалу.</span></li>
-        <li><span><b>Место.</b> Нажмите на город на карте или впишите название, если его нет на карте. Если точное место установить нельзя (безымянная деревня, вымышленная усадьба), нажмите «Точное место неизвестно».</span></li>
-        <li><span><b>Автор и название.</b> Выберите портрет (подписи можно включить) и впишите название.</span></li>
-        <li><span><b>Панель мешает?</b> Сверните её язычком сверху и разверните, когда будете готовы ответить.</span></li>
-      </ol>
-      <p class="score-line">За главу до 5 000 очков: место 1 500, направление 1 000, автор 1 000, название 1 500. После ответа можно получить ещё 300 за вопрос в духе ЕГЭ.</p>
-      <div class="lesson-bar" id="lessonBar" hidden><span id="lessonTxt"></span><button class="grade-all" id="lessonOff" type="button">Играть все сцены</button></div>
-      <div class="count-lab" id="gradeLab">Класс</div>
-      <div class="grade-row" id="gradeRow" role="group" aria-label="Выбор классов"></div>
-      <div class="grade-tools" id="gradeTools"><span class="grade-note" id="gradeNote"></span><button class="grade-all" id="gradeAll" type="button">Все классы</button></div>
-      <div class="count-lab">Сколько сцен?</div>
-      <div class="count-row" id="countRow"></div>
-      <div class="modes">
-        <label class="team-tg"><input type="checkbox" id="teamTg"> Командная игра (две команды по очереди)</label>
-        <div class="team-names" id="teamNames" hidden><input id="teamA" value="Команда 1" maxlength="24" aria-label="Первая команда"><input id="teamB" value="Команда 2" maxlength="24" aria-label="Вторая команда"></div>
-        <div class="mode-row">
-          <button class="ink-btn" id="btnLesson" hidden>Урок по коду</button>
-          <button class="ink-btn" id="btnLib">Моя библиотека</button>
-          <button class="ink-btn" id="btnTeacherSet">Для учителя</button>
-          <button class="ink-btn" id="btnTeacher" hidden>Кабинет учителя</button>
+      <section class="step" id="stepMode">
+        <div class="brand"><img src="img/emblem.png" alt=""><div><h1>Книгоскопъ</h1></div></div>
+        <p class="sub">сцены и герои русской литературы</p>
+        <p class="kicker">Выберите игру</p>
+        <h2 class="step-h">Что будем узнавать?</h2>
+        <button class="mode-card" data-mode="scene" type="button"><img src="img/s_strannik.webp" alt=""><span class="tag" id="mcScene">42 сцены</span><span class="num">I</span><span class="in"><span class="t">Угадай сцену</span><span class="d">Войдите в панораму, найдите детали из текста, назовите книгу.</span></span></button>
+        <button class="mode-card" data-mode="hero" type="button"><img src="img/s_h_chatsky.webp" alt=""><span class="tag new" id="mcHero">Новое · 5 героев</span><span class="num">II</span><span class="in"><span class="t">Угадай героя</span><span class="d">Вещи на столе выдадут хозяина.</span></span></button>
+        <aside class="byline">
+          <img class="byline-ph" src="img/author.jpg" alt="Кирилл Минкин">
+          <div class="byline-tx"><span class="byline-lab">Автор игры</span><b>Кирилл Минкин</b><small>учитель русского языка и литературы</small></div>
+          <div class="promo-links"><a class="ink-btn" href="https://t.me/egeminkin" target="_blank" rel="noopener">Telegram @egeminkin</a><a class="ink-btn" href="https://vk.ru/egeminkin" target="_blank" rel="noopener">ВКонтакте</a></div>
+        </aside>
+      </section>
+
+      <section class="step" id="stepWho" hidden>
+        <button class="back-link" id="backWho" type="button">← Выбор игры</button>
+        <p class="kicker" id="whoKick">Угадай сцену</p>
+        <h2 class="step-h">Кто вы?</h2>
+        <p class="step-sub">От этого зависит, что откроется дальше.</p>
+        <div class="doors">
+          <button class="door" id="doorStudent" type="button"><span class="ic"><svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 9 C11 6 15 7 17 9 C19 7 23 6 29 9 V27 C23 24 19 25 17 27 C15 25 11 24 5 27 Z"/><path d="M17 9 V27"/></svg></span><span><span class="t">Я ученик</span><span class="d">Играть самому: выбрать классы и число вопросов.</span></span><span class="ar">→</span></button>
+          <button class="door" id="doorTeacher" type="button"><span class="ic"><svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="7" width="24" height="16"/><path d="M11 29 h12 M17 23 v6"/><path d="M9 18 l5 -5 4 3 6 -6"/></svg></span><span><span class="t">Я учитель</span><span class="d">Собрать набор, дать ссылку классу, провести командную игру на слайде.</span></span><span class="ar">→</span></button>
         </div>
-      </div>
-      <aside class="byline">
-        <img class="byline-ph" src="img/author.jpg" alt="Кирилл Минкин">
-        <div class="byline-tx"><span class="byline-lab">Автор игры</span><b>Кирилл Минкин</b><small>учитель русского языка и литературы</small></div>
-        <div class="promo-links"><a class="ink-btn" href="https://t.me/egeminkin" target="_blank" rel="noopener">Telegram @egeminkin</a><a class="ink-btn" href="https://vk.ru/egeminkin" target="_blank" rel="noopener">ВКонтакте</a></div>
-      </aside>
+        <p class="count-lab">Есть код урока?</p>
+        <div class="code-row"><input id="codeLesson" maxlength="6" autocomplete="off" placeholder="K7QM" aria-label="Код урока"><button id="codeGo" type="button">Войти</button></div>
+        <p class="msg" id="codeMsg"></p>
+      </section>
+
+      <section class="step" id="stepPlay" hidden>
+        <button class="back-link" id="backPlay" type="button">← Назад</button>
+        <p class="kicker" id="playKick">Угадай сцену</p>
+        <h2 class="step-h">Настройте игру</h2>
+        <div class="lesson-bar" id="lessonBar" hidden><span id="lessonTxt"></span><button class="grade-all" id="lessonOff" type="button">Играть все</button></div>
+        <details class="rules"><summary>Как играть</summary>
+          <ol id="rulesScene">
+            <li><span><b>Осмотритесь.</b> Тяните сцену пальцем или мышью: она поворачивается по кругу. Кнопки «+» и «−», колёсико мыши или щипок приближают и отдаляют картинку.</span></li>
+            <li><span><b>Ищите детали.</b> Нажмите на предмет, который кажется важным: если он из текста, откроется цитата. Детали не подсвечены.</span></li>
+            <li><span><b>Направление.</b> Сдвиньте шкалу.</span></li>
+            <li><span><b>Место.</b> Нажмите на город на карте или впишите название, если его нет на карте. Если точное место установить нельзя (безымянная деревня, вымышленная усадьба), нажмите «Точное место неизвестно».</span></li>
+            <li><span><b>Автор и название.</b> Выберите портрет (подписи можно включить) и впишите название.</span></li>
+            <li><span><b>Панель мешает?</b> Сверните её язычком сверху и разверните, когда будете готовы ответить.</span></li>
+          </ol>
+          <ol id="rulesHero" hidden>
+            <li><span><b>Рассмотрите натюрморт.</b> Все вещи на столе принадлежат одному литературному герою.</span></li>
+            <li><span><b>Найдите детали.</b> Нажимайте на предметы: у каждой из 3–5 деталей есть косвенная подсказка. Детали не подсвечены.</span></li>
+            <li><span><b>Назовите героя.</b> Впишите имя, как героя называют в книге.</span></li>
+            <li><span><b>Автор, произведение, направление.</b> Портрет, название и шкала — как в режиме сцен.</span></li>
+          </ol>
+          <p class="score-line" id="scoreLineTxt">За главу до 5 000 очков: место 1 500, направление 1 000, автор 1 000, название 1 500. После ответа можно получить ещё 300 за вопрос в духе ЕГЭ.</p>
+        </details>
+        <div class="count-lab" id="gradeLab">Классы</div>
+        <div class="grade-row" id="gradeRow" role="group" aria-label="Выбор классов"></div>
+        <div class="grade-tools" id="gradeTools"><span class="grade-sum" id="gradeNote"></span><button class="grade-all" id="gradeAll" type="button">Выбрать все</button></div>
+        <div class="count-lab" id="countLab">Сколько сцен?</div>
+        <div class="count-row" id="countRow"></div>
+        <button class="go-btn" id="btnPlay" type="button"><span id="btnPlayTxt">Играть</span><span class="arr">→</span></button>
+        <div class="modes">
+          <label class="team-tg" hidden><input type="checkbox" id="teamTg"> Командная игра</label>
+          <div class="team-names" id="teamNames" hidden><input id="teamA" value="Команда 1" maxlength="24" aria-label="Первая команда"><input id="teamB" value="Команда 2" maxlength="24" aria-label="Вторая команда"></div>
+          <div class="mode-row">
+            <button class="ink-btn" id="btnLesson" hidden>Урок по коду</button>
+            <button class="ink-btn" id="btnLib">Моя библиотека</button>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
   <div class="screen panel" id="tsPanel" hidden><article class="page">
+    <button class="back-link" data-closep type="button">← Назад</button>
     <h2>Кабинет учителя</h2>
-    <p class="note">Отметьте сцены, которые должны выпасть ученикам, и скопируйте ссылку на этот набор. Ученик, открывший ссылку, играет именно в отмеченные сцены. Доступ по подписке на канал нужен по-прежнему: после входа набор сохранится.</p>
-    <div class="ts-bar"><span id="tsCount">Выбрано: 0</span><button class="grade-all" id="tsReset" type="button">Сбросить</button></div>
-    <div id="tsList"></div>
-    <div class="fld"><label for="tsLink">Ссылка для учеников</label><input class="txt-in" id="tsLink" readonly></div>
-    <p class="msg" id="tsMsg"></p>
-    <div class="prow"><button class="pbtn" id="tsCopy" type="button">Скопировать ссылку</button><button class="pbtn ghost" id="tsPlay" type="button">Показать как у учеников</button><button class="pbtn ghost" data-closep>Закрыть</button></div>
+    <div class="hub-tabs" id="hubTabs"><button class="on" data-tab="set" type="button">Набор</button><button data-tab="class" type="button">Классу</button><button data-tab="slide" type="button">На слайде</button></div>
+    <section class="hub-tab" data-tab="set">
+      <p class="note">Отметьте, что должно выпасть ученикам. Набор сохраняется в этом браузере и нужен для ссылки и для игры на слайде.</p>
+      <div class="seg" id="tsMode"><button data-m="scene" type="button">Сцены<small id="tsMcScene"></small></button><button data-m="hero" type="button">Герои<small id="tsMcHero"></small></button></div>
+      <div class="ts-bar"><span id="tsCount">Выбрано: 0</span><button class="grade-all" id="tsReset" type="button">Сбросить</button></div>
+      <div id="tsList"></div>
+    </section>
+    <section class="hub-tab" data-tab="class" hidden>
+      <p class="note">Ученик, открывший ссылку, играет именно в отмеченное. Доступ по подписке на канал нужен по-прежнему: после входа набор сохранится.</p>
+      <div class="fld"><label for="tsLink">Ссылка для учеников</label><input class="txt-in" id="tsLink" readonly></div>
+      <p class="msg" id="tsMsg"></p>
+      <div class="prow"><button class="pbtn" id="tsCopy" type="button">Скопировать ссылку</button><button class="pbtn ghost" id="tsPlay" type="button">Показать как у учеников</button></div>
+      <h3>Уроки с результатами</h3>
+      <p class="note">Коды уроков и таблица результатов работают, когда игра открыта в Claude.</p>
+      <div class="prow"><button class="pbtn ghost" id="btnTeacher" type="button" hidden>Открыть уроки</button></div>
+    </section>
+    <section class="hub-tab" data-tab="slide" hidden>
+      <p class="note">Игра для всего класса на проекторе: две команды отвечают по очереди вслух, очки начисляете вы. Если в наборе ничего не отмечено, выпадут шесть случайных вопросов выбранного режима.</p>
+      <div class="team-names"><input id="slideA" value="Команда 1" maxlength="24" aria-label="Первая команда"><input id="slideB" value="Команда 2" maxlength="24" aria-label="Вторая команда"></div>
+      <p class="note" id="slideSum"></p>
+      <button class="go-btn" id="slideGo" type="button"><span>▶ Начать на слайде</span><span class="arr">→</span></button>
+      <h3>Управление</h3>
+      <ul class="kbd-list">
+        <li><kbd>Пробел</kbd> или <kbd>→</kbd> — показать ответ, затем следующий вопрос</li>
+        <li><kbd>D</kbd> — открыть следующую скрытую деталь с подсказкой</li>
+        <li><kbd>1</kbd> / <kbd>2</kbd> — +1 очко команде, с <kbd>Shift</kbd> — +3</li>
+        <li>Подойдёт пульт для презентаций: он нажимает стрелки и пробел</li>
+      </ul>
+    </section>
   </article></div>
 
   <div class="screen panel" id="libPanel" hidden><article class="page">
@@ -673,6 +846,7 @@ const MAX = {place:1500, dir:1000, author:1000, title:1500};
 const AUTHORS = [
   {id:'unknown', name:'Автор неизвестен', anon:true},
   {id:'karamzin', name:'Н. М. Карамзин'},
+  {id:'zhukovsky', name:'В. А. Жуковский'},
   {id:'pushkin', name:'А. С. Пушкин'},
   {id:'lermontov', name:'М. Ю. Лермонтов'},
   {id:'gogol', name:'Н. В. Гоголь'},
@@ -1208,6 +1382,60 @@ ROUNDS.forEach(r=>{if(SPOTS[r.id]) r.spots=SPOTS[r.id];});
 const READY = ["aust", "blok", "borodino", "braslet", "capri", "chp", "don", "famusov", "fili", "glupov", "grib", "izergil", "groza", "ionych", "kapdoch", "levsha", "liza", "matryona", "meri", "mtsyri", "nadne", "nekrasov", "oblomov", "olesya", "plennik", "mumu", "rozhdestvo", "bezhin", "bulba", "onegin", "otcy", "pin", "plyushkin", "rekviem", "revizor", "sad", "shen", "slovo", "sobach", "strannik", "taman", "vsadnik"];
 const POOL = ROUNDS.filter(r=>READY.includes(r.id));
 POOL.forEach(r=>{r.img='img/s_'+r.id+'.webp';});
+/* --- режим «Угадай героя»: натюрморты из вещей героя (9 класс) --- */
+const HEROES = [
+  {id:'h_igor', hero:true, loop:1, img:'img/s_h_igor.webp', heroName:'Князь Игорь Святославич', heroAlt:['игорь','князь игорь','игорь святославич','игорь северский'],
+   title:'Слово о полку Игореве', titleAlt:['слово о полку игореве','слово о полку игоря','слово о полку'], author:'unknown', dir:1, year:'конец XII века', place:'',
+   details:['шелом с водой','червлёный щит','копьё','солнечное затмение'],
+   desc:'Новгород-северский князь Игорь Святославич повёл дружину на половцев, не послушав знамения — солнечного затмения. Войско разбито, князь попадает в плен, но бежит и возвращается на Русь. Автор «Слова» не прославляет поход, а горюет о княжеских раздорах.',
+   quote:'', cite:'',
+   spots:[{x:.18,y:.09,w:.215,h:.50,t:'Шелом',q:'Он мечтал зачерпнуть воды из далёкой степной реки — не чашей, а тем, что носят на голове.'},
+          {x:.695,y:.365,w:.255,h:.63,t:'Червлёный щит',q:'Такими щитами русичи перегородили широкое степное поле. Их цвет в древности называли червлёным.'},
+          {x:.43,y:.73,w:.255,h:.20,t:'Копьё',q:'Его хотели преломить о самый край чужого поля — дойти до конца земли кочевников.'},
+          {x:.80,y:.03,w:.09,h:.13,t:'Затмение',q:'Перед походом солнце вдруг померкло, а войско оказалось во тьме. Князь не повернул назад.'}]},
+  {id:'h_yaroslavna', hero:true, loop:1, img:'img/s_h_yaroslavna.webp', heroName:'Ярославна', heroAlt:['ярославна','евфросиния ярославна','ефросинья ярославна','княгиня ярославна'],
+   title:'Слово о полку Игореве', titleAlt:['слово о полку игореве','слово о полку игоря','слово о полку'], author:'unknown', dir:1, year:'конец XII века', place:'',
+   details:['шёлковый рукав','кукушка-зегзица','солнце на рассвете','река в степи','городская стена'],
+   desc:'Ярославна — жена князя Игоря. Её плач на городской стене Путивля — самое известное место «Слова»: она обращается к ветру, Днепру и солнцу и просит вернуть мужа. Вслед за плачем Игорь бежит из плена.',
+   quote:'Ярославна рано плачетъ въ Путивлѣ на забралѣ, аркучи…', cite:'«Слово о полку Игореве»',
+   spots:[{x:.04,y:.41,w:.44,h:.59,t:'Шёлковый рукав',q:'Она хочет омочить его в далёкой реке, чтобы утереть мужу кровавые раны.'},
+          {x:.825,y:.048,w:.14,h:.30,t:'Кукушка',q:'В древности её называли зегзицей. Героиня хочет полететь этой птицей к мужу.'},
+          {x:.70,y:.12,w:.08,h:.08,t:'Солнце',q:'Его называют светлым и тресветлым, но упрекают: зачем в безводной степи оно палило воинов мужа?'},
+          {x:.45,y:.21,w:.35,h:.24,t:'Река',q:'К реке она обращается как к господину: та пробила каменные горы — пусть же принесёт ей мужа.'},
+          {x:0,y:0,w:.16,h:.40,t:'Городская стена',q:'Рано утром она плачет на стене родного города, глядя в сторону степи.'}]},
+  {id:'h_liza', hero:true, loop:1, img:'img/s_h_liza.webp', heroName:'Лиза', heroAlt:['лиза','бедная лиза'],
+   title:'Бедная Лиза', titleAlt:['бедная лиза'], author:'karamzin', dir:2, year:'1792', place:'',
+   details:['корзинка ландышей','кувшин молока','вязанье','десять империалов','пруд под дубами'],
+   desc:'Лиза — бедная крестьянка из-под Москвы: после смерти отца она кормит больную мать, продавая в городе цветы и рукоделие. Она полюбила дворянина Эраста, но тот, проиграв в карты имение, женился на богатой вдове. Узнав об этом, Лиза бросилась в пруд. Повесть сделала чувство главной ценностью — это сентиментализм.',
+   quote:'…и крестьянки любить умеют!', cite:'Н. М. Карамзин, «Бедная Лиза»',
+   spots:[{x:.015,y:.25,w:.355,h:.36,t:'Ландыши',q:'С ними она весной пришла в город. Незнакомец предложил за букет рубль, а она просила пять копеек.'},
+          {x:.32,y:.355,w:.185,h:.38,t:'Кувшин молока',q:'Усталый гость попросил у старушки свежего молока, а принесла его дочь.'},
+          {x:.47,y:.56,w:.29,h:.35,t:'Вязанье',q:'Она трудилась день и ночь: ткала холсты, вязала, весной рвала цветы — и всё продавала в Москве.'},
+          {x:.31,y:.75,w:.15,h:.15,t:'Десять империалов',q:'Перед концом она попросит соседскую девочку отнести эти деньги матери и сказать, что они не краденые.'},
+          {x:.555,y:.32,w:.39,h:.27,t:'Пруд под дубами',q:'Глубокий пруд в тени столетних дубов был свидетелем её счастья — и здесь же всё кончилось.'}]},
+  {id:'h_svetlana', hero:true, loop:1, img:'img/s_h_svetlana.webp', heroName:'Светлана', heroAlt:['светлана'],
+   title:'Светлана', titleAlt:['светлана'], author:'zhukovsky', dir:3, year:'1808–1812', place:'',
+   details:['зеркало со свечой','белый голубок','чаша с перстнем','башмачок','колокольчик'],
+   desc:'Героиня баллады Жуковского гадает в крещенский вечер о женихе, от которого давно нет вестей. Ей снится страшный сон: жених оказывается мертвецом. Наутро звенит колокольчик — милый вернулся живым. Баллада — вольное переложение «Леноры» Бюргера и образец русского романтизма.',
+   quote:'Раз в крещенский вечерок\nДевушки гадали…', cite:'В. А. Жуковский, «Светлана»',
+   spots:[{x:.245,y:.20,w:.19,h:.40,t:'Зеркало со свечой',q:'В полночь в чистом стекле можно без обмана узнать свой жребий. Подруги сказали — и она решилась.'},
+          {x:.25,y:.016,w:.105,h:.17,t:'Белый голубок',q:'В страшную минуту белоснежный гость тихо слетает к ней и укрывает крыльями.'},
+          {x:.262,y:.61,w:.148,h:.17,t:'Чаша с перстнем',q:'В чашу с чистой водой клали перстень и серьги, а над ней пели подблюдные песенки.'},
+          {x:.665,y:.815,w:.085,h:.11,t:'Башмачок',q:'Его, сняв с ноги, бросали за ворота: так девушки гадали в крещенский вечер.'},
+          {x:.855,y:.48,w:.06,h:.13,t:'Колокольчик',q:'Звонкий звон за окном — и всё страшное оказывается только сном.'}]},
+  {id:'h_chatsky', hero:true, loop:1, img:'img/s_h_chatsky.webp', heroName:'Александр Андреевич Чацкий', heroAlt:['чацкий','александр чацкий','александр андреевич чацкий','александр андреич чацкий'],
+   title:'Горе от ума', titleAlt:['горе от ума'], author:'griboedov', dir:4, year:'1824', place:'',
+   details:['плащ в снегу','дорожный сундук','книги','карета у крыльца'],
+   desc:'Чацкий возвращается в Москву после трёх лет странствий и сразу едет к Софье. Он спорит с Фамусовым и его гостями, а те объявляют его сумасшедшим. Узнав, что Софья любит Молчалина, Чацкий уезжает со словами «Карету мне, карету!».',
+   quote:'Чуть свет — уж на ногах! и я у ваших ног.', cite:'А. С. Грибоедов, «Горе от ума»',
+   spots:[{x:.03,y:.37,w:.41,h:.63,t:'Плащ в снегу',q:'Больше семисот вёрст без отдыха, в ветер и бурю, — и сразу сюда, чуть свет.'},
+          {x:.645,y:.195,w:.355,h:.39,t:'Дорожный сундук',q:'Три года странствий по чужим краям. Вернулся — а здесь будто ничего не изменилось.'},
+          {x:.49,y:.55,w:.18,h:.19,t:'Книги',q:'В этом доме уверены: всё зло от учёности, и книги лучше бы собрать да сжечь.'},
+          {x:.224,y:.23,w:.17,h:.23,t:'Карета',q:'Последние слова героя — о ней: скорее прочь из этого города.'}]}
+];
+const HPOOL = HEROES;
+const ALLPOOL = POOL.concat(HPOOL);
+
 const CITY = Object.fromEntries(MAP.cities.map(c=>[c.id,c]));
 const LBL = {tiflis:'below',capri:'below',schongrabern:'below',naples:'left'};
 const PRIO = {spb:1,msk:1,kiev:1,kazan:1,rome:1,vienna:1,berlin:1,kavkaz:1,
@@ -1225,11 +1453,12 @@ let S; // game state
 function newGame(mode,opts){
   opts=opts||{}; $('final').hidden=true;
   const list = opts.list || shuffle(POOL).slice(0,Math.min(POOL.length,+mode||6));
-  S = {r:0, total:0, results:[], list, authorOrder:shuffle(AUTHORS), teams:opts.teams?opts.teams.map(n=>({n,score:0})):null, lesson:opts.lesson||null};
+  S = {r:0, total:0, results:[], list, authorOrder:shuffle(AUTHORS), teams:opts.teams?opts.teams.map(n=>({n,score:0})):null, lesson:opts.lesson||null, present:!!opts.present};
+  document.body.classList.toggle('present',S.present); $('pbar').hidden=!S.present; $('pexit').hidden=!S.present;
   buildAuthors();
   startRound();
 }
-function blankAnswer(){return {place:null, dir:null, author:null, title:''};}
+function blankAnswer(){return {place:null, dir:null, author:null, title:'', hero:''};}
 
 /* ---------- panorama (looping, zoomable) ---------- */
 const LOOPK=1/1.35; // original image width share inside the looped texture (по умолчанию; у сцены с полным кольцом задано loop:1)
@@ -1241,7 +1470,7 @@ function baseScale(){const W=pano.clientWidth,H=pano.clientHeight;return Math.ma
 function sizePano(){const s=baseScale()*P.z;P.w=img.naturalWidth*s;P.h=img.naturalHeight*s;tiles.forEach(t=>{t.style.width=(P.w+1)+'px';t.style.marginRight='-1px';t.style.height=P.h+'px';});}
 function layoutPano(keep){
   if(!img.naturalWidth) return; const W=pano.clientWidth,H=pano.clientHeight;
-  const u=keep&&P.w?(W/2-P.x)/P.w:0.1, v=keep&&P.h?(H/2-P.y)/P.h:.5;
+  const u=keep&&P.w?(W/2-P.x)/P.w:(P.flat?0.5:0.1), v=keep&&P.h?(H/2-P.y)/P.h:.5;
   sizePano(); P.x=W/2-u*P.w; P.y=H/2-v*P.h; clampPano(); applyPano();
 }
 function zoomPano(f,cx,cy){
@@ -1250,9 +1479,9 @@ function zoomPano(f,cx,cy){
   const u=(cx-P.x)/P.w, v=(cy-P.y)/P.h; P.z=z; sizePano(); P.x=cx-u*P.w; P.y=cy-v*P.h; clampPano(); applyPano(); P.idle=false;
 }
 function clampPano(){const H=pano.clientHeight;P.y = P.h<=H ? (H-P.h)/2 : Math.min(0,Math.max(H-P.h,P.y));}
-function applyPano(){ if(!P.w) return; const o=((P.x%P.w)+P.w)%P.w; strip.style.transform=`translate3d(${o-P.w}px,${P.y}px,0)`;}
+function applyPano(){ if(!P.w) return; if(P.flat){const W=pano.clientWidth; P.x=Math.min(0,Math.max(W-P.w,P.x)); strip.style.transform=`translate3d(${P.x-P.w}px,${P.y}px,0)`; return;} const o=((P.x%P.w)+P.w)%P.w; strip.style.transform=`translate3d(${o-P.w}px,${P.y}px,0)`;}
 function loadScene(R){
-  strip.classList.add('loading'); P.z=1;
+  strip.classList.add('loading'); P.z=1; P.flat=!!R.hero; tiles[0].style.visibility=tiles[2].style.visibility=P.flat?'hidden':'';
   const src=R.img.replace('/s_','/l_');
   img.onload=()=>{imgs.slice(1).forEach(i=>i.src=src);layoutPano(false);strip.classList.remove('loading');P.idle=true;$('dragHint').classList.remove('gone');};
   img.src=src; drawSpots(R);
@@ -1274,7 +1503,7 @@ new ResizeObserver(syncDock).observe(dockEl);
 $('dockTab').onclick=()=>{const m=dockEl.classList.toggle('min');$('dockTab').textContent=m?'▴ панель ответа':'▾ свернуть панель';$('dockTab').setAttribute('aria-expanded',!m);};
 function tick(t){
   const dt=Math.min(50,t-(P.last||t)); P.last=t;
-  if(P.idle && !P.drag && P.w){ P.x-=dt*0.018; applyPano(); }
+  if(P.idle && !P.drag && P.w && !P.flat){ P.x-=dt*0.018; applyPano(); }
   else if(!P.drag && Math.abs(P.vx)>0.05){P.x+=P.vx;P.vx*=0.94;applyPano();}
   requestAnimationFrame(tick);
 }
@@ -1418,13 +1647,15 @@ function markAuthor(){document.querySelectorAll('.auth').forEach(b=>b.classList.
 $('namesToggle').addEventListener('change',e=>$('gridAuth').classList.toggle('nonames',!e.target.checked));
 $('titleInput').addEventListener('input',e=>{S.a.title=e.target.value;updateChips();});
 $('titleInput').addEventListener('keydown',e=>{if(e.key==='Enter'){closeSheets();}});
+$('heroInput').addEventListener('input',e=>{S.a.hero=e.target.value;updateChips();});
+$('heroInput').addEventListener('keydown',e=>{if(e.key==='Enter'){closeSheets();}});
 
 /* ---------- chips & sheets ---------- */
 function updateChips(){
   const a=S.a;
   const pv = a.place ? (a.place.type==='city'?CITY[a.place.id].name:(a.place.type==='unknown'?'точное место неизвестно':a.place.text)) : null;
   $('btnUnknown').classList.toggle('on',!!(a.place&&a.place.type==='unknown'));
-  setChip('chipPlace','valPlace',pv,'отметить на карте');
+  if(S.list[S.r].hero) setChip('chipPlace','valPlace',a.hero.trim()||null,'вписать имя'); else setChip('chipPlace','valPlace',pv,'отметить на карте');
   const au = a.author ? AUTHORS.find(x=>x.id===a.author) : null;
   setChip('chipAuthor','valAuthor',au?( $('namesToggle').checked||au.anon ? au.name : 'Портрет выбран'):null,'узнать по портрету');
   setChip('chipTitle','valTitle',a.title.trim()?('«'+a.title.trim()+'»'):null,'вписать');
@@ -1432,7 +1663,7 @@ function updateChips(){
   hideConfirm();
 }
 function setChip(id,vid,val,ph){const c=$(id);c.classList.toggle('filled',!!val);c.classList.toggle('empty',!val);$(vid).textContent=val||ph;}
-function openSheet(id){closeSheets();$(id).hidden=false;if(id==='sheetMap'){applyVB();}if(id==='sheetTitle'){setTimeout(()=>$('titleInput').focus(),30);}$('dragHint').classList.add('gone');}
+function openSheet(id){closeSheets();$(id).hidden=false;if(id==='sheetMap'){applyVB();}if(id==='sheetTitle'){setTimeout(()=>$('titleInput').focus(),30);}if(id==='sheetHero'){setTimeout(()=>$('heroInput').focus(),30);}$('dragHint').classList.add('gone');}
 function closeSheets(){document.querySelectorAll('.sheet').forEach(s=>s.hidden=true);}
 document.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{const s=$(b.dataset.open);s.hidden?openSheet(b.dataset.open):closeSheets();});
 document.querySelectorAll('[data-close]').forEach(b=>b.onclick=closeSheets);
@@ -1442,14 +1673,17 @@ addEventListener('keydown',e=>{if(e.key==='Escape')closeSheets();});
 /* ---------- rounds ---------- */
 function startRound(){
   const R=S.list[S.r]; S.a=blankAnswer();
+  const H=!!R.hero; $('labPlace').textContent=H?'Герой':'Место'; $('chipPlace').dataset.open=H?'sheetHero':'sheetMap'; $('heroInput').value='';
+  document.querySelectorAll('.top .rw').forEach(e=>e.textContent=H?'Герой':'Глава');
   $('roundNum').textContent=S.r+1; $('roundTot').textContent=S.list.length; scoreLine();
   $('placeInput').value=''; $('titleInput').value=''; markAuthor(); setDir(null); updateChips(); closeSheets();
   if(M.svg){M.vb={x:0,y:0,w:MAP.w,h:MAP.h};applyVB();}
   S.found=new Set(); loadScene(R);
   const nx=S.list[S.r+1]; if(nx){const p=new Image();p.src=nx.img.replace('/s_','/l_');}
   $('result').hidden=true;$('final').hidden=true;
+  if(S.present) renderPbar();
 }
-function missing(){const a=S.a,m=[];if(!a.place)m.push('место');if(a.dir==null)m.push('направление');if(!a.author)m.push('автор');if(!a.title.trim())m.push('название');return m;}
+function missing(){const a=S.a,m=[];if(S.list[S.r].hero){if(!a.hero.trim())m.push('герой');}else if(!a.place)m.push('место');if(a.dir==null)m.push('направление');if(!a.author)m.push('автор');if(!a.title.trim())m.push('название');return m;}
 function hideConfirm(){$('confirmBar').hidden=true;$('btnAnswer').hidden=false;}
 $('btnAnswer').onclick=()=>{const m=missing();if(m.length){$('confirmTxt').textContent='Не заполнено: '+m.join(', ')+'.';$('confirmBar').hidden=false;$('btnAnswer').hidden=true;closeSheets();}else submit();};
 $('btnBack').onclick=hideConfirm; $('btnForce').onclick=()=>{hideConfirm();submit();};
@@ -1475,38 +1709,41 @@ function scorePlace(R,a){
 function scoreTitle(R,t){const n=norm(t); if(!n) return {pts:0,det:'Название не вписано'};
   const ok=R.titleAlt.some(a=>{const d=lev(n,a);return n===a||d<=Math.max(1,Math.floor(a.length*0.2));});
   return {pts:ok?MAX.title:0,det:`Ваш ответ: <b>«${esc(t.trim())}»</b>`+(ok?'':` · верно: «${R.title}»`)};}
+function scoreHero(R,t){const n=norm(t); if(!n) return {pts:0,det:'Герой не назван'};
+  const ok=R.heroAlt.some(a=>n===a||(' '+n+' ').includes(' '+a+' ')||lev(n,a)<=Math.max(1,Math.floor(a.length*0.2)));
+  return {pts:ok?MAX.place:0,det:`Ваш ответ: <b>${esc(t.trim())}</b>`+(ok?' · верно':` · верно: ${R.heroName}`)};}
 function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 
 function submit(){
   const R=S.list[S.r], a=S.a;
-  const pl=scorePlace(R,a);
+  const pl=R.hero?scoreHero(R,a.hero):scorePlace(R,a);
   const dirOk=a.dir===R.dir||(R.dirAlt||[]).includes(a.dir);
   const dr={pts:dirOk?MAX.dir:0,det:a.dir==null?'Направление не выбрано':`Ваш ответ: <b>${DIRS[a.dir]}</b>`+(dirOk?'':` · верно: ${DIRS[R.dir]}`)};
   const auOk=a.author===R.author; const au=a.author?AUTHORS.find(x=>x.id===a.author):null; const auR=AUTHORS.find(x=>x.id===R.author);
   const ar={pts:auOk?MAX.author:0,det:au?`Ваш выбор: <b>${au.name}</b>`+(auOk?'':` · верно: ${auR.name}`):'Автор не выбран'};
   const tr=scoreTitle(R,a.title);
   const sp=null;
-  const sum=pl.pts+dr.pts+ar.pts+tr.pts; addPts(sum); S.results.push({R,sum,team:S.teams?S.r%2:null}); if(tr.pts>0) libAdd(R.id); saveLesson();
+  const sum=pl.pts+dr.pts+ar.pts+tr.pts; addPts(sum); S.results.push({R,sum,team:S.teams?S.r%2:null}); if(tr.pts>0&&!R.hero) libAdd(R.id); saveLesson();
   showResult(R,{pl,dr,ar,tr,sp,sum});
 }
 function showResult(R,x){
   const au=AUTHORS.find(a=>a.id===R.author);
-  $('resRound').innerHTML=`Глава <b>${S.r+1}</b>&nbsp;из&nbsp;<b>${S.list.length}</b>`;
+  $('resRound').innerHTML=`${R.hero?'Герой':'Глава'} <b>${S.r+1}</b>&nbsp;из&nbsp;<b>${S.list.length}</b>`;
   $('resImg').src=R.img;
   $('resEyebrow').textContent=DIRS[R.dir]+' · '+R.year;
-  $('resTitle').textContent='«'+R.title+'»';
-  $('resFacts').innerHTML=`<span>Автор: <b>${au.name}</b></span><span>Место: <b>${R.place}</b></span>`;
+  $('resTitle').textContent=R.hero?R.heroName:'«'+R.title+'»';
+  $('resFacts').innerHTML=R.hero?`<span>Произведение: <b>«${esc(R.title)}»</b></span><span>Автор: <b>${au.name}</b></span>`:`<span>Автор: <b>${au.name}</b></span><span>Место: <b>${R.place}</b></span>`;
   $('resDesc').textContent=R.desc;
-  $('resQuote').innerHTML=esc(R.quote)+`<cite>${R.cite}</cite>`;
+  $('resQuote').hidden=!R.quote; $('resQuote').innerHTML=R.quote?esc(R.quote)+`<cite>${R.cite}</cite>`:'';
   $('resDetails').innerHTML=(R.details||[]).map(d=>`<li>${esc(d)}</li>`).join('');
   const fnd=R.spots?[...S.found].map(k=>R.spots[k].t):[]; $('resFound').textContent=fnd.length?'Вы открыли в сцене: '+fnd.join(', ')+'.':''; $('resFound').hidden=!fnd.length;
     const row=(lab,r,max)=>`<div class="lrow ${r.pts>=max?'ok':(r.pts===0?'no':'')}"><span class="lab">${lab}</span><span class="pts">${fmt(r.pts)} <small>из ${fmt(max)}</small></span><span class="det">${r.det}</span></div>`;
   const mx=roundMax(R);
-  $('resTiles').innerHTML=row('Место',x.pl,MAX.place)+row('Направление',x.dr,MAX.dir)+row('Автор',x.ar,MAX.author)+row('Название',x.tr,MAX.title)+(x.sp?row('Детали сцены',x.sp,x.sp.max):'')+`<div class="lrow sum"><span class="lab">Итого за главу</span><span class="pts">${fmt(x.sum)} <small>из ${fmt(mx)}</small></span></div>`;
-  $('btnNext').textContent = S.r+1<S.list.length?'Следующая глава':'Итоги';
+  $('resTiles').innerHTML=row(R.hero?'Герой':'Место',x.pl,MAX.place)+row('Направление',x.dr,MAX.dir)+row('Автор',x.ar,MAX.author)+row('Название',x.tr,MAX.title)+(x.sp?row('Детали сцены',x.sp,x.sp.max):'')+`<div class="lrow sum"><span class="lab">Итого за главу</span><span class="pts">${fmt(x.sum)} <small>из ${fmt(mx)}</small></span></div>`;
+  $('btnNext').textContent = S.r+1<S.list.length?(S.list[S.r+1].hero?'Следующий герой':'Следующая глава'):'Итоги';
   scoreLine(); renderEge(R);
   $('result').hidden=false; $('result').scrollTop=0;
-  $('resMap').hidden=!!R.noPlace; document.querySelector('.legend').hidden=!!R.noPlace; if(!R.noPlace) drawResultMap(R,x.pl);
+  const noMap=!!(R.noPlace||R.hero); $('resMap').hidden=noMap; document.querySelector('.legend').hidden=noMap; if(!noMap) drawResultMap(R,x.pl);
 }
 function drawResultMap(R,pl){
   const box=$('resMap'); box.innerHTML='';
@@ -1531,66 +1768,93 @@ $('btnNext').onclick=()=>{S.r++; if(S.r<S.list.length) startRound(); else showFi
 function showFinal(){
   $('finTotal').textContent=fmt(S.total);
   const mx=S.list.reduce((a,R)=>a+roundMax(R),0), t=S.total/mx; $('finOf').textContent='из '+fmt(mx); $('finRank').textContent = t>=0.83?'Магистр словесности':t>=0.6?'Знаток русской литературы':t>=0.33?'Внимательный читатель':'Читатель-новичок';
-  $('finList').innerHTML=S.results.map((r,i)=>`<div class="rrow"><img src="${thumb(r.R)}" alt=""><span class="t">«${r.R.title}»<small>${AUTHORS.find(a=>a.id===r.R.author).name} · ${DIRS[r.R.dir]}</small></span><span class="p">${fmt(r.sum)}</span></div>`).join('');
+  $('finList').innerHTML=S.results.map((r,i)=>`<div class="rrow"><img src="${thumb(r.R)}" alt=""><span class="t">${r.R.hero?esc(r.R.heroName)+' · ':''}«${r.R.title}»<small>${AUTHORS.find(a=>a.id===r.R.author).name} · ${DIRS[r.R.dir]}</small></span><span class="p">${fmt(r.sum)}</span></div>`).join('');
   if(S.teams){const [a,b]=S.teams;$('finTeams').hidden=false;$('finTeams').innerHTML=`<span class="${a.score>b.score?'w':''}">${esc(a.n)}: ${fmt(a.score)}</span><span class="${b.score>a.score?'w':''}">${esc(b.n)}: ${fmt(b.score)}</span>`;$('finRank').textContent=a.score===b.score?'Ничья!':'Победа: '+(a.score>b.score?a.n:b.n);}else $('finTeams').hidden=true;
+  if(S.present){$('finTotal').textContent=fmt(S.teams[0].score)+' : '+fmt(S.teams[1].score);$('finOf').textContent='счёт команд';}
   const fs=$('finSync'); fs.hidden=!S.lesson; if(S.lesson){fs.textContent='Отправляю результат учителю…'; saveLesson().then(()=>{fs.textContent=S.lesson.err?'Результат не удалось отправить — покажите этот экран учителю.':'Результат отправлен учителю (урок '+S.lesson.code+').';});}
   $('result').hidden=true; $('final').hidden=false; $('final').scrollTop=0;
 }
-$('btnAgain').onclick=()=>{$('final').hidden=true;$('intro').hidden=false;};
+$('btnAgain').onclick=()=>{if(S&&S.present){exitPresent();return;}$('final').hidden=true;$('intro').hidden=false;};
 function roundMax(R){return 5000;}
 /* --- выбор классов: сцены распределены по федеральной рабочей программе --- */
 const GRADES={slovo:[9],liza:[9],shinel:[8],vsadnik:[9],mtsyri:[8],pin:[10],capri:[11],chp:[11],grib:[11],kapdoch:[8],shen:[10],aust:[10],borodino:[10],fili:[10],groza:[10],blok:[11],taman:[9],meri:[9],oblomov:[10],revizor:[8],famusov:[9],sad:[10],nadne:[11],don:[11],onegin:[9],plyushkin:[9],otcy:[10],matryona:[8],rekviem:[11],glupov:[10],sobach:[8],nekrasov:[10],braslet:[11],levsha:[6],strannik:[10],ionych:[10],izergil:[7,11],olesya:[11],plennik:[5],mumu:[5],rozhdestvo:[5],bezhin:[6],bulba:[7]};
 const GRADE_LIST=[5,6,7,8,9,10,11];
 const inGrades=(R,set)=>(GRADES[R.id]||GRADE_LIST).some(g=>set.has(g));
-const gradeCount=g=>POOL.filter(R=>inGrades(R,new Set([g]))).length;
-const selGrades=new Set(GRADE_LIST.filter(g=>gradeCount(g)>0));
+let MODE='scene', COUNT=6;
+const modePool=()=>MODE==='hero'?HPOOL:POOL;
+const gradeCount=g=>modePool().filter(R=>inGrades(R,new Set([g]))).length;
+const selGrades=new Set();
+function resetGrades(){selGrades.clear();GRADE_LIST.forEach(g=>{if(gradeCount(g)>0)selGrades.add(g);});}
+resetGrades();
+HEROES.forEach(R=>{GRADES[R.id]=[9];});
 let LESSON=null; // набор сцен от учителя (id), если открыта ссылка ?s=…
 const LKEY='knigoskop_lesson';
 {const q=new URLSearchParams(location.search).get('s'); let ids=null;
  if(q){ids=q.split(',').map(x=>x.trim()).filter(Boolean);}
  else{try{const v=JSON.parse(localStorage.getItem(LKEY)||'null');if(Array.isArray(v))ids=v;}catch(e){}}
- if(ids){const ok=ids.filter(id=>POOL.some(R=>R.id===id)); if(ok.length){LESSON=ok; try{localStorage.setItem(LKEY,JSON.stringify(ok));}catch(e){}}}}
-const gradePool=()=>LESSON?POOL.filter(R=>LESSON.includes(R.id)):POOL.filter(R=>inGrades(R,selGrades));
-const sceneWord=n=>n===1?'сцена':n<5?'сцены':'сцен';
+ if(ids){const ok=ids.filter(id=>ALLPOOL.some(R=>R.id===id)); if(ok.length){LESSON=ok; try{localStorage.setItem(LKEY,JSON.stringify(ok));}catch(e){}}}}
+if(LESSON&&LESSON.every(id=>HPOOL.some(R=>R.id===id))){MODE='hero';resetGrades();}
+const gradePool=()=>LESSON?ALLPOOL.filter(R=>LESSON.includes(R.id)):modePool().filter(R=>inGrades(R,selGrades));
+const sceneWord=n=>{const d=n%10,h=n%100;return d===1&&h!==11?'сцена':(d>=2&&d<=4&&(h<12||h>14)?'сцены':'сцен');};
+const heroWord=n=>{const d=n%10,h=n%100;return d===1&&h!==11?'герой':(d>=2&&d<=4&&(h<12||h>14)?'героя':'героев');};
+const unitWord=n=>MODE==='hero'?heroWord(n):sceneWord(n);
 function renderGrades(){
   ['gradeLab','gradeRow','gradeTools'].forEach(id=>$(id).hidden=!!LESSON); $('lessonBar').hidden=!LESSON;
-  if(LESSON){const n=gradePool().length;$('lessonTxt').textContent='Набор от учителя: '+n+' '+sceneWord(n);return;}
-  $('gradeRow').innerHTML=GRADE_LIST.map(g=>{const c=gradeCount(g);return c?`<button type="button" data-g="${g}" aria-pressed="${selGrades.has(g)}" aria-label="${g} класс, ${c} ${sceneWord(c)}">${g}<small>${c}</small></button>`:`<button type="button" disabled aria-label="${g} класс, скоро">${g}<small>скоро</small></button>`;}).join('');
+  if(LESSON){const n=gradePool().length;$('lessonTxt').textContent='Набор от учителя: '+n+' '+unitWord(n);return;}
+  $('gradeRow').innerHTML=GRADE_LIST.map(g=>{const c=gradeCount(g);return c?`<button type="button" data-g="${g}" aria-pressed="${selGrades.has(g)}" aria-label="${g} класс, ${c} ${unitWord(c)}"><span class="box"></span>${g}<small>${c} ${unitWord(c)}</small></button>`:`<button type="button" disabled aria-label="${g} класс, скоро"><span class="box"></span>${g}<small>скоро</small></button>`;}).join('');
   $('gradeRow').querySelectorAll('button[data-g]').forEach(b=>b.onclick=()=>{const g=+b.dataset.g;if(selGrades.has(g)){if(selGrades.size>1)selGrades.delete(g);}else selGrades.add(g);renderGrades();renderCount();});
-  const n=gradePool().length; $('gradeNote').textContent='В выбранных классах: '+n+' '+sceneWord(n);
+  const n=gradePool().length, gs=[...selGrades].sort((a,b)=>a-b); $('gradeNote').innerHTML='<b>'+n+'</b> '+unitWord(n)+(gs.length?' · '+gs.join(', ')+' кл.':'');
 }
 function renderCount(){
   const cr=$('countRow'), N=gradePool().length;
   const opts=[3,6,9,N].filter((v,i,a)=>v>0&&v<=N&&a.indexOf(v)===i);
-  cr.innerHTML=opts.map(n=>`<button data-n="${n}">${n}<small>${n===N?'все сцены':sceneWord(n)}</small></button>`).join('');
-  cr.querySelectorAll('button').forEach(b=>b.onclick=()=>{const tm=$('teamTg').checked?[$('teamA').value.trim()||'Команда 1',$('teamB').value.trim()||'Команда 2']:null;newGame(0,{teams:tm,list:shuffle(gradePool()).slice(0,+b.dataset.n)});drawRuler();$('intro').hidden=true;});
+  if(!opts.includes(COUNT)) COUNT=opts.includes(6)?6:(opts[opts.length-1]||0);
+  cr.style.gridTemplateColumns='repeat('+Math.max(1,opts.length)+',minmax(0,1fr))';
+  cr.innerHTML=opts.map(n=>`<button type="button" data-n="${n}" aria-pressed="${n===COUNT}">${n}<small>${n===N&&opts.length>1?'все':unitWord(n)}</small></button>`).join('');
+  cr.querySelectorAll('button').forEach(b=>b.onclick=()=>{COUNT=+b.dataset.n;renderCount();});
+  $('btnPlayTxt').textContent=COUNT?'Играть · '+COUNT+' '+unitWord(COUNT):'Нет вопросов в выбранных классах';
 }
+$('btnPlay').onclick=()=>{if(!COUNT)return;newGame(0,{list:shuffle(gradePool()).slice(0,COUNT)});drawRuler();$('intro').hidden=true;};
 $('gradeAll').onclick=()=>{GRADE_LIST.forEach(g=>{if(gradeCount(g)>0)selGrades.add(g);});renderGrades();renderCount();};
-$('lessonOff').onclick=()=>{LESSON=null;try{localStorage.removeItem(LKEY);}catch(e){}history.replaceState(null,'',location.href.split(/[?#]/)[0]);renderGrades();renderCount();};
+$('lessonOff').onclick=()=>{LESSON=null;resetGrades();try{localStorage.removeItem(LKEY);}catch(e){}history.replaceState(null,'',location.href.split(/[?#]/)[0]);renderGrades();renderCount();};
 /* --- кабинет учителя: набор сцен галочками → ссылка для учеников --- */
 const TKEY='knigoskop_teacher_sel';
+let TSMODE='scene';
+const tsPool=()=>TSMODE==='hero'?HPOOL:POOL;
+const tsKey=()=>TSMODE==='hero'?TKEY+'_hero':TKEY;
 function tsSel(){return [...new Set([...document.querySelectorAll('#tsList input:checked')].map(i=>i.value))];}
-function tsUpdate(){const ids=tsSel(); $('tsCount').textContent='Выбрано: '+ids.length+' '+sceneWord(ids.length); $('tsLink').value=ids.length?location.href.split(/[?#]/)[0]+'?s='+ids.join(','):''; $('tsMsg').textContent='';
-  try{localStorage.setItem(TKEY,JSON.stringify(ids));}catch(e){}}
-function openTeacherSet(){
-  let saved=[]; try{saved=JSON.parse(localStorage.getItem(TKEY)||'[]');}catch(e){}
-  $('tsList').innerHTML=GRADE_LIST.filter(g=>gradeCount(g)>0).map(g=>{
-    const sc=POOL.filter(R=>inGrades(R,new Set([g])));
+function tsWord(n){return TSMODE==='hero'?heroWord(n):sceneWord(n);}
+function tsUpdate(){const ids=tsSel(); $('tsCount').textContent='Выбрано: '+ids.length+' '+tsWord(ids.length); $('tsLink').value=ids.length?location.href.split(/[?#]/)[0]+'?s='+ids.join(','):''; $('tsMsg').textContent='';
+  $('slideSum').textContent=ids.length?'На слайде будет: '+ids.length+' '+tsWord(ids.length)+' из набора.':'Набор пуст — выпадут шесть случайных вопросов режима «'+(TSMODE==='hero'?'Угадай героя':'Угадай сцену')+'».';
+  try{localStorage.setItem(tsKey(),JSON.stringify(ids));}catch(e){}}
+function buildTsList(){
+  let saved=[]; try{saved=JSON.parse(localStorage.getItem(tsKey())||'[]');}catch(e){}
+  document.querySelectorAll('#tsMode button').forEach(b=>b.classList.toggle('on',b.dataset.m===TSMODE));
+  $('tsMcScene').textContent=POOL.length+' '+sceneWord(POOL.length); $('tsMcHero').textContent=HPOOL.length+' '+heroWord(HPOOL.length);
+  const pool=tsPool();
+  $('tsList').innerHTML=GRADE_LIST.filter(g=>pool.some(R=>inGrades(R,new Set([g])))).map(g=>{
+    const sc=pool.filter(R=>inGrades(R,new Set([g])));
     return `<section class="ts-grade"><div class="ts-head"><h3>${g} класс</h3><button type="button" class="grade-all" data-tg="${g}">Выбрать весь класс</button></div>`+
-      sc.map(R=>{const au=AUTHORS.find(a=>a.id===R.author);return `<label><input type="checkbox" value="${R.id}"${saved.includes(R.id)?' checked':''}><span>«${esc(R.title)}»<small>${esc(au.name)} · ${esc(R.place)}</small></span></label>`;}).join('')+'</section>';}).join('');
+      sc.map(R=>{const au=AUTHORS.find(a=>a.id===R.author);return `<label><input type="checkbox" value="${R.id}"${saved.includes(R.id)?' checked':''}><img src="${thumb(R)}" alt="" loading="lazy"><span>${R.hero?esc(R.heroName)+' · ':''}«${esc(R.title)}»<small>${esc(au.name)}${R.hero?'':' · '+esc(R.place)}</small></span></label>`;}).join('')+'</section>';}).join('');
   $('tsList').querySelectorAll('[data-tg]').forEach(b=>b.onclick=()=>{const bx=[...b.closest('section').querySelectorAll('input')],on=bx.some(i=>!i.checked);bx.forEach(i=>i.checked=on);tsUpdate();});
   $('tsList').querySelectorAll('input').forEach(i=>i.onchange=tsUpdate);
-  tsUpdate(); $('tsPanel').hidden=false; $('tsPanel').scrollTop=0;
+  tsUpdate();
 }
-$('btnTeacherSet').onclick=openTeacherSet;
+function hubTab(t){document.querySelectorAll('#hubTabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));document.querySelectorAll('#tsPanel .hub-tab').forEach(x=>x.hidden=x.dataset.tab!==t);}
+function openTeacherSet(m){
+  if(m==='hero'||m==='scene') TSMODE=m;
+  buildTsList(); hubTab('set'); $('tsPanel').hidden=false; $('tsPanel').scrollTop=0;
+}
+document.querySelectorAll('#hubTabs button').forEach(b=>b.onclick=()=>hubTab(b.dataset.tab));
+document.querySelectorAll('#tsMode button').forEach(b=>b.onclick=()=>{TSMODE=b.dataset.m;buildTsList();});
 $('tsReset').onclick=()=>{document.querySelectorAll('#tsList input').forEach(i=>i.checked=false);tsUpdate();};
 $('tsLink').onfocus=e=>e.target.select();
-$('tsCopy').onclick=()=>{const m=$('tsMsg'),v=$('tsLink').value; if(!v){m.className='msg';m.textContent='Отметьте хотя бы одну сцену';return;}
+$('tsCopy').onclick=()=>{const m=$('tsMsg'),v=$('tsLink').value; if(!v){m.className='msg';m.textContent='Отметьте хотя бы одну позицию на вкладке «Набор»';return;}
   const ok=()=>{m.className='msg ok';m.textContent='Ссылка скопирована';}, no=()=>{$('tsLink').select();m.className='msg';m.textContent='Скопируйте ссылку из поля вручную';};
   (navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(v).then(ok,no):Promise.reject()).catch(no);};
-$('tsPlay').onclick=()=>{const ids=tsSel(); if(!ids.length){$('tsMsg').className='msg';$('tsMsg').textContent='Отметьте хотя бы одну сцену';return;}
-  LESSON=ids; $('tsPanel').hidden=true; renderGrades(); renderCount(); $('intro').scrollTop=0;};
-renderGrades(); renderCount();
+$('tsPlay').onclick=()=>{const ids=tsSel(); if(!ids.length){$('tsMsg').className='msg';$('tsMsg').textContent='Отметьте хотя бы одну позицию в наборе';return;}
+  LESSON=ids; MODE=TSMODE; resetGrades(); $('tsPanel').hidden=true; applyModeTexts(); renderGrades(); renderCount(); showStep('stepPlay');};
+$('slideGo').onclick=startPresent;
 const EGE={
  slovo:{q:'Ярославна обращается к Ветру, Днепру и Солнцу. Как называется такой приём?',o:['Риторическое обращение','Гипербола','Литота','Градация'],a:0,e:'Обращение к неодушевлённому как к живому собеседнику: риторическое обращение (апострофа) в сочетании с олицетворением.'},
  liza:{q:'Какая фраза рассказчика стала крылатой?',o:['«И крестьянки любить умеют»','«Рукописи не горят»','«Счастливые часов не наблюдают»','«Человек — это звучит гордо»'],a:0,e:'«…ибо и крестьянки любить умеют» — формула сентиментализма: чувство не зависит от сословия.'},
@@ -1671,7 +1935,7 @@ function renderEge(R){
     const i=+b.dataset.i, ok=i===E.a;
     box.querySelectorAll('.eo button').forEach(x=>{if(+x.dataset.i===E.a)x.classList.add('ok');});
     if(!ok)b.classList.add('no');
-    if(ok){addPts(BONUS);const last=S.results[S.results.length-1];last.bonus=BONUS;last.sum+=BONUS;scoreLine();saveLesson();}
+    if(ok&&!S.present){addPts(BONUS);const last=S.results[S.results.length-1];last.bonus=BONUS;last.sum+=BONUS;scoreLine();saveLesson();}
     const ee=box.querySelector('.ee');ee.hidden=false;ee.innerHTML=(ok?'<b>Верно, +'+BONUS+'.</b> ':'<b>Не совсем.</b> ')+esc(E.e);
   });
   box.dataset.done='0';
@@ -1771,6 +2035,57 @@ $('btnLib').onclick=openLib;
 $('btnLesson').onclick=openLessonJoin;
 $('btnJoin').onclick=joinLesson;
 $('btnTeacher').onclick=openTeacher;
+/* --- стартовые шаги: режим → кто вы → настройка --- */
+function showStep(id){['stepMode','stepWho','stepPlay'].forEach(x=>$(x).hidden=x!==id);$('intro').scrollTop=0;}
+function applyModeTexts(){const H=MODE==='hero', t=H?'Угадай героя':'Угадай сцену';
+  $('whoKick').textContent=t; $('playKick').textContent=t; $('countLab').textContent=H?'Сколько героев?':'Сколько сцен?';
+  $('rulesScene').hidden=H; $('rulesHero').hidden=!H;
+  $('scoreLineTxt').textContent=H?'За героя до 5 000 очков: герой 1 500, направление 1 000, автор 1 000, произведение 1 500.':'За главу до 5 000 очков: место 1 500, направление 1 000, автор 1 000, название 1 500. После ответа можно получить ещё 300 за вопрос в духе ЕГЭ.';}
+function setMode(m){MODE=m;LESSON=null;try{localStorage.removeItem(LKEY);}catch(e){}resetGrades();COUNT=6;applyModeTexts();renderGrades();renderCount();}
+document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{setMode(b.dataset.mode);showStep('stepWho');});
+$('backWho').onclick=()=>showStep('stepMode');
+$('backPlay').onclick=()=>showStep(LESSON?'stepMode':'stepWho');
+$('doorStudent').onclick=()=>showStep('stepPlay');
+$('doorTeacher').onclick=()=>openTeacherSet(MODE);
+$('codeGo').onclick=()=>{const c=$('codeLesson').value.trim().toUpperCase().replace(/[^A-Z0-9]/g,''), m=$('codeMsg'); m.className='msg';
+  if(c.length!==4){m.textContent='Код урока — 4 символа.';return;}
+  if(!CAP.db){m.textContent='Уроки по коду работают, когда игра открыта в Claude по ссылке учителя. Попросите у учителя ссылку на набор.';return;}
+  m.textContent=''; $('lesCode').value=c; openLessonJoin();};
+$('codeLesson').addEventListener('keydown',e=>{if(e.key==='Enter')$('codeGo').click();});
+$('mcScene').textContent=POOL.length+' '+sceneWord(POOL.length);
+$('mcHero').textContent='Новое · '+HPOOL.length+' '+heroWord(HPOOL.length);
+applyModeTexts(); renderGrades(); renderCount();
+showStep(LESSON?'stepPlay':'stepMode');
+
+/* --- командная игра на слайде: очки начисляет учитель --- */
+function startPresent(){
+  const ids=tsSel(), pool=tsPool(), list=ids.length?pool.filter(R=>ids.includes(R.id)):shuffle(pool).slice(0,6);
+  const tm=[$('slideA').value.trim()||'Команда 1',$('slideB').value.trim()||'Команда 2'];
+  $('tsPanel').hidden=true; newGame(0,{list:shuffle(list),teams:tm,present:true}); drawRuler(); $('intro').hidden=true;
+  try{const d=document.documentElement; if(d.requestFullscreen) d.requestFullscreen().catch(()=>{});}catch(e){}
+}
+function renderPbar(){ if(!S||!S.present) return; [0,1].forEach(i=>{$('pn'+i).textContent=S.teams[i].n;$('pp'+i).textContent=fmt(S.teams[i].score);$('pt'+i).classList.toggle('turn',S.r%2===i);}); scoreLine(); }
+function pAdd(i,n){ if(!S||!S.present) return; S.teams[i].score=Math.max(0,S.teams[i].score+n); renderPbar(); }
+function pDetail(){ const R=S.list[S.r]; if(!R.spots||!R.spots.length||!$('result').hidden) return;
+  let k=R.spots.findIndex((s,i)=>!S.found.has(i)); if(k<0) k=0; const s=R.spots[k], LK=R.loop||LOOPK;
+  P.idle=false; P.vx=0; P.x=pano.clientWidth/2-(s.x+s.w/2)*LK*P.w; applyPano(); findSpot(k);
+  document.querySelectorAll(`.spot[data-k="${k}"]`).forEach(b=>b.classList.add('shown')); }
+function pReveal(){ if(!$('result').hidden) return; const R=S.list[S.r]; closeSheets(); S.results.push({R,sum:0,team:null});
+  const z={pts:0,det:''}; showResult(R,{pl:z,dr:z,ar:z,tr:z,sp:null,sum:0}); }
+function pNext(){ if(!$('final').hidden) return; if($('result').hidden){pReveal();return;} $('btnNext').click(); }
+document.querySelectorAll('[data-pa]').forEach(b=>b.onclick=()=>{const [i,n]=b.dataset.pa.split(',').map(Number);pAdd(i,n);});
+$('pDet').onclick=pDetail; $('pAns').onclick=pReveal; $('pNx').onclick=pNext;
+function exitPresent(){ try{if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});}catch(e){}
+  document.body.classList.remove('present'); $('pbar').hidden=true; $('pexit').hidden=true; if(S) S.present=false;
+  $('result').hidden=true; $('final').hidden=true; $('intro').hidden=false; showStep('stepMode'); }
+$('pexit').onclick=exitPresent;
+addEventListener('keydown',e=>{
+  if(!S||!S.present||!$('intro').hidden) return; const tg=document.activeElement&&document.activeElement.tagName; if(tg==='INPUT'||tg==='TEXTAREA') return;
+  if(e.code==='Space'||e.key==='ArrowRight'||e.key==='PageDown'){e.preventDefault();pNext();}
+  else if(e.code==='Digit1'){pAdd(0,e.shiftKey?3:1);} else if(e.code==='Digit2'){pAdd(1,e.shiftKey?3:1);}
+  else if(e.code==='KeyD'){pDetail();}
+});
+
 $('btnCreate').onclick=createLesson;
 $('btnPickAll').onclick=()=>{const b=[...$('scenePick').querySelectorAll('input')],on=b.some(i=>!i.checked);b.forEach(i=>i.checked=on);};
 document.querySelectorAll('[data-closep]').forEach(b=>b.onclick=()=>{b.closest('.panel').hidden=true;});
