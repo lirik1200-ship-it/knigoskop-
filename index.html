@@ -111,7 +111,10 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:2px so
 /* ---------- masthead band ---------- */
 .top{position:absolute;left:0;right:0;top:0;height:var(--mast);box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 var(--s-lg);z-index:3;
   background:var(--ink);color:var(--canvas);}
-.logo{font-family:var(--display);font-weight:400;font-size:24px;letter-spacing:-.01em;line-height:1;color:var(--canvas);}
+.logo{display:inline-flex;align-items:center;gap:8px;padding:0;border:0;background:none;cursor:pointer;font-family:var(--display);font-weight:400;font-size:24px;letter-spacing:-.01em;line-height:1;color:var(--canvas);}
+.drag-hint.zoomy svg{display:none;}
+.logo img{width:34px;height:34px;flex:none;transition:transform .2s var(--ease-in);}
+.logo:hover img,.logo:focus-visible img{transform:rotate(-8deg) scale(1.08);}
 .top-right{display:flex;align-items:stretch;height:100%;}
 .plate{display:inline-flex;align-items:center;gap:5px;padding:0 var(--s-md);white-space:nowrap;
   font-family:var(--ui);font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:#b5b5b5;border-left:1px solid #333;}
@@ -540,11 +543,11 @@ body.present #resTiles,body.present .legend,body.present .rrow .p{display:none!i
   <div class="vignette"></div>
   <div class="drag-hint" id="dragHint">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M4 12l3-3M4 12l3 3M20 12l-3-3M20 12l-3 3"/></svg>
-    Потяните, чтобы осмотреться
+    <span id="dragTxt">Потяните, чтобы осмотреться</span>
   </div>
 
   <header class="top">
-    <div class="logo">Книгоскопъ</div>
+    <button class="logo" id="btnHome" title="На главную" aria-label="Книгоскопъ — на главную"><img src="img/emblem.png" alt="">Книгоскопъ</button>
     <div class="top-right">
       <div class="plate"><span class="rw">Глава</span> <b id="roundNum">1</b>&nbsp;из&nbsp;<b id="roundTot">6</b></div>
       <div class="plate" id="turnPlate" hidden></div>
@@ -1466,7 +1469,8 @@ const pano=$('pano'), strip=$('strip');
 strip.innerHTML=[0,1,2].map(()=>'<div class="ptile"><img alt=""><div class="spots"></div></div>').join('');
 const tiles=[...strip.querySelectorAll('.ptile')], imgs=tiles.map(t=>t.querySelector('img')), img=imgs[0];
 const P={x:0,y:0,w:0,h:0,z:1,vx:0,drag:null,idle:true,last:0,pinch:null,ptrs:new Map()};
-function baseScale(){const W=pano.clientWidth,H=pano.clientHeight;return Math.max(H/img.naturalHeight,W/img.naturalWidth);}
+function mastH(){const t=document.querySelector('.top');return t?t.offsetHeight:0;}
+function baseScale(){const W=pano.clientWidth,H=pano.clientHeight;if(P.flat)return Math.min((H-mastH())/img.naturalHeight,W/img.naturalWidth);return Math.max(H/img.naturalHeight,W/img.naturalWidth);}
 function sizePano(){const s=baseScale()*P.z;P.w=img.naturalWidth*s;P.h=img.naturalHeight*s;tiles.forEach(t=>{t.style.width=(P.w+1)+'px';t.style.marginRight='-1px';t.style.height=P.h+'px';});}
 function layoutPano(keep){
   if(!img.naturalWidth) return; const W=pano.clientWidth,H=pano.clientHeight;
@@ -1474,14 +1478,14 @@ function layoutPano(keep){
   sizePano(); P.x=W/2-u*P.w; P.y=H/2-v*P.h; clampPano(); applyPano();
 }
 function zoomPano(f,cx,cy){
-  if(!P.w) return; const z=Math.min(3.2,Math.max(0.5,P.z*f)); if(z===P.z) return;
+  if(!P.w) return; const z=P.flat?Math.min(5,Math.max(1,P.z*f)):Math.min(3.2,Math.max(0.5,P.z*f)); if(z===P.z) return;
   const r=pano.getBoundingClientRect(); cx=(cx??r.left+r.width/2)-r.left; cy=(cy??r.top+r.height/2)-r.top;
   const u=(cx-P.x)/P.w, v=(cy-P.y)/P.h; P.z=z; sizePano(); P.x=cx-u*P.w; P.y=cy-v*P.h; clampPano(); applyPano(); P.idle=false;
 }
-function clampPano(){const H=pano.clientHeight;P.y = P.h<=H ? (H-P.h)/2 : Math.min(0,Math.max(H-P.h,P.y));}
-function applyPano(){ if(!P.w) return; if(P.flat){const W=pano.clientWidth; P.x=Math.min(0,Math.max(W-P.w,P.x)); strip.style.transform=`translate3d(${P.x-P.w}px,${P.y}px,0)`; return;} const o=((P.x%P.w)+P.w)%P.w; strip.style.transform=`translate3d(${o-P.w}px,${P.y}px,0)`;}
+function clampPano(){const H=pano.clientHeight;if(P.flat){const m=mastH(),h=H-m;P.y=P.h<=h?m+(h-P.h)/2:Math.min(m,Math.max(H-P.h,P.y));return;}P.y = P.h<=H ? (H-P.h)/2 : Math.min(0,Math.max(H-P.h,P.y));}
+function applyPano(){ if(!P.w) return; if(P.flat){const W=pano.clientWidth; P.x=P.w<=W?(W-P.w)/2:Math.min(0,Math.max(W-P.w,P.x)); strip.style.transform=`translate3d(${P.x-P.w}px,${P.y}px,0)`; return;} const o=((P.x%P.w)+P.w)%P.w; strip.style.transform=`translate3d(${o-P.w}px,${P.y}px,0)`;}
 function loadScene(R){
-  strip.classList.add('loading'); P.z=1; P.flat=!!R.hero; tiles[0].style.visibility=tiles[2].style.visibility=P.flat?'hidden':'';
+  strip.classList.add('loading'); P.z=1; P.flat=!!R.hero; tiles[0].style.visibility=tiles[2].style.visibility=P.flat?'hidden':''; $('dragHint').classList.toggle('zoomy',P.flat); $('dragTxt').textContent=P.flat?'Приближайте, чтобы рассмотреть детали':'Потяните, чтобы осмотреться';
   const src=R.img.replace('/s_','/l_');
   img.onload=()=>{imgs.slice(1).forEach(i=>i.src=src);layoutPano(false);strip.classList.remove('loading');P.idle=true;$('dragHint').classList.remove('gone');};
   img.src=src; drawSpots(R);
@@ -2079,6 +2083,10 @@ function exitPresent(){ try{if(document.fullscreenElement) document.exitFullscre
   document.body.classList.remove('present'); $('pbar').hidden=true; $('pexit').hidden=true; if(S) S.present=false;
   $('result').hidden=true; $('final').hidden=true; $('intro').hidden=false; showStep('stepMode'); }
 $('pexit').onclick=exitPresent;
+$('btnHome').onclick=()=>{ const mid=S&&$('final').hidden&&$('intro').hidden;
+  if(mid&&!confirm('Закончить партию и вернуться на главную? Очки этой партии не сохранятся.')) return;
+  closeSheets(); $('spotNote').hidden=true; if(S&&S.present){exitPresent();return;}
+  $('result').hidden=true; $('final').hidden=true; $('intro').hidden=false; showStep('stepMode'); };
 addEventListener('keydown',e=>{
   if(!S||!S.present||!$('intro').hidden) return; const tg=document.activeElement&&document.activeElement.tagName; if(tg==='INPUT'||tg==='TEXTAREA') return;
   if(e.code==='Space'||e.key==='ArrowRight'||e.key==='PageDown'){e.preventDefault();pNext();}
