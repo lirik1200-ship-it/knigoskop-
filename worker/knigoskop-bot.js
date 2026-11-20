@@ -103,6 +103,13 @@ async function isChannelAdmin(env, uid) {
 }
 
 /* ---------- сцена дня: расписание и вопросы лежат в day.json рядом с игрой ---------- */
+const HOOKS = ['Узнаёте это место?', 'Где мы оказались?', 'Из какой книги этот вид?', 'В какую книгу мы заглянули?', 'Чья это история?'];
+const hiddenDetails = n => {
+  const a = n % 10, b = n % 100;
+  if (a === 1 && b !== 11) return `спрятана ${n} деталь`;
+  return a >= 2 && a <= 4 && (b < 12 || b > 14) ? `спрятаны ${n} детали` : `спрятано ${n} деталей`;
+};
+
 // i — номер дня с нуля; без него берётся сегодняшний (для пробного поста до старта — первый)
 async function postDay(env, chat, i) {
   const D = await (await fetch(env.GAME_URL + 'day.json?' + Date.now())).json();
@@ -114,14 +121,18 @@ async function postDay(env, chat, i) {
     }
   }
   const d = D.days[i % D.days.length];
-  const photo = await api(env, 'sendPhoto', {
-    chat_id: chat,
-    photo: env.GAME_URL + 'img/day/' + d.id + '.jpg',
-    caption: `Сцена дня № ${i + 1} · ${d.grade} класс\n\n` +
-      'Где мы оказались? Угадайте произведение в опросе ниже, а в игре осмотритесь по кругу: в сцене спрятаны детали из текста.',
-    reply_markup: { inline_keyboard: [[{ text: 'Осмотреть сцену в игре', url: env.GAME_URL + '?s=' + d.id + '&day=' + (i + 1) }]] },
-  });
-  if (!photo.ok) return 'Картинка не отправлена: ' + photo.description;
+  const caption = `🔎 <b>СЦЕНА ДНЯ · № ${i + 1}</b>\n` +
+    `<i>из <a href="${env.GAME_URL}">«Книгоскопа»</a> — моей игры по русской литературе</i>\n\n` +
+    `<b>${HOOKS[i % HOOKS.length]}</b>\n` +
+    'Панорама поворачивается по кругу, присмотритесь к деталям. Ответ выбирайте в викторине ниже 👇\n\n' +
+    `В игре здесь ${hiddenDetails(d.spots)} из текста. Сколько найдёте вы?\n\n` +
+    `#сцена_дня #книгоскоп #${d.grade}класс`;
+  const reply_markup = { inline_keyboard: [[{ text: '🔭 Найти детали в игре', url: env.GAME_URL + '?s=' + d.id + '&day=' + (i + 1) }]] };
+  const media = env.GAME_URL + 'img/day/' + d.id;
+  // ролик-петля по кругу панорамы; если Telegram его не принял — обычная картинка
+  let post = await api(env, 'sendAnimation', { chat_id: chat, animation: media + '.mp4', caption, parse_mode: 'HTML', reply_markup });
+  if (!post.ok) post = await api(env, 'sendPhoto', { chat_id: chat, photo: media + '.jpg', caption, parse_mode: 'HTML', reply_markup });
+  if (!post.ok) return 'Пост не отправлен: ' + post.description;
   const poll = await api(env, 'sendPoll', {
     chat_id: chat,
     question: 'Из какого произведения эта сцена?',
