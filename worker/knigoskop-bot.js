@@ -6,11 +6,15 @@
 //   SIGN_KEY  — секрет, любая длинная случайная строка (подпись ссылок доступа)
 //   CHANNEL   — переменная, например @egeminkin
 //   GAME_URL  — переменная, например https://lirik1200-ship-it.github.io/knigoskop-/
+//   DAY_ON    — переменная, 1 = публиковать «Сцену дня» в канал по расписанию (Settings → Triggers → Cron)
 // Бот должен быть администратором канала, иначе Telegram не покажет ему подписчиков.
 
 const TTL = 30 * 24 * 3600; // ссылка доступа живёт 30 дней; подписка всё равно перепроверяется при входе
 
 export default {
+  async scheduled(event, env, ctx) {
+    if (String(env.DAY_ON) === '1') ctx.waitUntil(postDay(env, env.CHANNEL));
+  },
   async fetch(req, env) {
     const url = new URL(req.url);
     try {
@@ -55,7 +59,17 @@ async function onUpdate(req, env) {
   const chat = msg ? msg.chat.id : cb ? cb.message.chat.id : null;
   if (!from || !chat) return new Response('ok');
   if (cb) await api(env, 'answerCallbackQuery', { callback_query_id: cb.id });
-  if (msg && !(msg.text || '').startsWith('/start') && !/доступ|игр/i.test(msg.text || '')) {
+  if (msg && /^\/preview\b/.test(msg.text || '')) {
+    if (!(await isChannelAdmin(env, from.id))) {
+      await api(env, 'sendMessage', { chat_id: chat, text: 'Пробный пост доступен только администраторам канала.' });
+      return new Response('ok');
+    }
+    const n = parseInt((msg.text.split(/\s+/)[1] || ''), 10);
+    const res = await postDay(env, chat, n > 0 ? n - 1 : null);
+    if (res !== 'ok') await api(env, 'sendMessage', { chat_id: chat, text: res });
+    return new Response('ok');
+  }
+  if (msg &&!(msg.text || '').startsWith('/start') && !/доступ|игр/i.test(msg.text || '')) {
     await api(env, 'sendMessage', { chat_id: chat, text: 'Нажмите /start, чтобы получить доступ к игре «Книгоскопъ».' });
     return new Response('ok');
   }
@@ -81,6 +95,43 @@ async function onUpdate(req, env) {
     await api(env, 'sendMessage', { chat_id: chat, text: 'Не получилось проверить подписку. Попробуйте ещё раз через минуту.' });
   }
   return new Response('ok');
+}
+
+async function isChannelAdmin(env, uid) {
+  const r = await api(env, 'getChatMember', { chat_id: env.CHANNEL, user_id: uid });
+  return r.ok && (r.result.status === 'creator' || r.result.status === 'administrator');
+}
+
+/* ---------- сцена дня: расписание и вопросы лежат в day.json рядом с игрой ---------- */
+// i — номер дня с нуля; без него берётся сегодняшний (для пробного поста до старта — первый)
+async function postDay(env, chat, i) {
+  const D = await (await fetch(env.GAME_URL + 'day.json?' + Date.now())).json();
+  if (i == null) {
+    i = Math.floor((Date.now() - Date.parse(D.start)) / 864e5);
+    if (i < 0) {
+      if (chat === env.CHANNEL) return 'Сцены дня ещё не начались';
+      i = 0;
+    }
+  }
+  const d = D.days[i % D.days.length];
+  const photo = await api(env, 'sendPhoto', {
+    chat_id: chat,
+    photo: env.GAME_URL + 'img/day/' + d.id + '.jpg',
+    caption: `Сцена дня № ${i + 1} · ${d.grade} класс\n\n` +
+      'Где мы оказались? Угадайте произведение в опросе ниже, а в игре осмотритесь по кругу: в сцене спрятаны детали из текста.',
+    reply_markup: { inline_keyboard: [[{ text: 'Осмотреть сцену в игре', url: env.GAME_URL + '?s=' + d.id + '&day=' + (i + 1) }]] },
+  });
+  if (!photo.ok) return 'Картинка не отправлена: ' + photo.description;
+  const poll = await api(env, 'sendPoll', {
+    chat_id: chat,
+    question: 'Из какого произведения эта сцена?',
+    options: d.options.map(text => ({ text })),
+    type: 'quiz',
+    correct_option_id: d.correct,
+    explanation: d.explanation,
+    is_anonymous: true,
+  });
+  return poll.ok ? 'ok' : 'Опрос не отправлен: ' + poll.description;
 }
 
 /* ---------- сайт ---------- */

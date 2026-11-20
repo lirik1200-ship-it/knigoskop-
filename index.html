@@ -2262,7 +2262,9 @@ resetGrades();
 HEROES.forEach(R=>{GRADES[R.id]=[R.grade||9];});
 let LESSON=null; // набор сцен от учителя (id), если открыта ссылка ?s=…
 const LKEY='knigoskop_lesson';
-{const q=new URLSearchParams(location.search).get('s'); let ids=null;
+let DAYNO=null; // «Сцена дня» из Telegram-канала: ссылка ?s=<id>&day=<номер>
+{const sp=new URLSearchParams(location.search), q=sp.get('s'); let ids=null;
+ try{if(q){const d=sp.get('day');d?localStorage.setItem('knigoskop_day',d):localStorage.removeItem('knigoskop_day');}DAYNO=localStorage.getItem('knigoskop_day');}catch(e){}
  if(q){ids=q.split(',').map(x=>x.trim()).filter(Boolean);}
  else{try{const v=JSON.parse(localStorage.getItem(LKEY)||'null');if(Array.isArray(v))ids=v;}catch(e){}}
  if(ids){const ok=ids.filter(id=>ALLPOOL.some(R=>R.id===id)); if(ok.length){LESSON=ok; try{localStorage.setItem(LKEY,JSON.stringify(ok));}catch(e){}}}}
@@ -2273,7 +2275,7 @@ const heroWord=n=>{const d=n%10,h=n%100;return d===1&&h!==11?'герой':(d>=2&
 const unitWord=n=>MODE==='hero'?heroWord(n):sceneWord(n);
 function renderGrades(){
   ['gradeLab','gradeRow','gradeTools'].forEach(id=>$(id).hidden=!!LESSON); $('lessonBar').hidden=!LESSON;
-  if(LESSON){const n=gradePool().length;$('lessonTxt').textContent='Набор от учителя: '+n+' '+unitWord(n);return;}
+  if(LESSON){const n=gradePool().length;$('lessonTxt').textContent=DAYNO?'Сцена дня № '+DAYNO:'Набор от учителя: '+n+' '+unitWord(n);return;}
   $('gradeRow').innerHTML=GRADE_LIST.map(g=>{const c=gradeCount(g);return c?`<button type="button" data-g="${g}" aria-pressed="${selGrades.has(g)}" aria-label="${g} класс, ${c} ${unitWord(c)}"><span class="box"></span>${g}<small>${c} ${unitWord(c)}</small></button>`:`<button type="button" disabled aria-label="${g} класс, скоро"><span class="box"></span>${g}<small>скоро</small></button>`;}).join('');
   $('gradeRow').querySelectorAll('button[data-g]').forEach(b=>b.onclick=()=>{const g=+b.dataset.g;if(selGrades.has(g)){if(selGrades.size>1)selGrades.delete(g);}else selGrades.add(g);renderGrades();renderCount();});
   const n=gradePool().length, gs=[...selGrades].sort((a,b)=>a-b); $('gradeNote').innerHTML='<b>'+n+'</b> '+unitWord(n)+(gs.length?' · '+gs.join(', ')+' кл.':'');
@@ -2289,7 +2291,7 @@ function renderCount(){
 }
 $('btnPlay').onclick=()=>{if(!COUNT)return;newGame(0,{list:shuffle(gradePool()).slice(0,COUNT)});drawRuler();$('intro').hidden=true;};
 $('gradeAll').onclick=()=>{GRADE_LIST.forEach(g=>{if(gradeCount(g)>0)selGrades.add(g);});renderGrades();renderCount();};
-$('lessonOff').onclick=()=>{LESSON=null;resetGrades();try{localStorage.removeItem(LKEY);}catch(e){}history.replaceState(null,'',location.href.split(/[?#]/)[0]);renderGrades();renderCount();};
+$('lessonOff').onclick=()=>{LESSON=null;DAYNO=null;resetGrades();try{localStorage.removeItem(LKEY);localStorage.removeItem('knigoskop_day');}catch(e){}history.replaceState(null,'',location.href.split(/[?#]/)[0]);renderGrades();renderCount();};
 /* --- кабинет учителя: набор сцен галочками → ссылка для учеников --- */
 const TKEY='knigoskop_teacher_sel';
 let TSMODE='scene';
