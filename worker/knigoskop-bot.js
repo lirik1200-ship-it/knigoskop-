@@ -7,6 +7,8 @@
 //   CHANNEL   — переменная, например @egeminkin
 //   GAME_URL  — переменная, например https://lirik1200-ship-it.github.io/knigoskop-/
 //   DAY_ON    — переменная, 1 = публиковать «Сцену дня» (Cron `0 11,14 * * *` = 14:00 и 17:00 МСК; дни и время берутся из day.json)
+//   IG_ON, IG_USER_ID, IG_TOKEN — публикация роликов в Instagram (см. блок «Instagram» ниже); команда /ig [n] — пробная публикация
+//   DB        — привязка D1 (Bindings → D1 database): анонимная статистика игры. Без неё статистика просто не пишется
 // Бот должен быть администратором канала, иначе Telegram не покажет ему подписчиков.
 
 const TTL = 30 * 24 * 3600; // ссылка доступа живёт 30 дней; подписка всё равно перепроверяется при входе
@@ -15,12 +17,14 @@ export default {
   async scheduled(event, env, ctx) {
     if (String(env.DAY_ON) === '1') ctx.waitUntil(postDay(env, env.CHANNEL));
   },
-  async fetch(req, env) {
+  async fetch(req, env, ctx) {
     const url = new URL(req.url);
     try {
-      if (url.pathname === '/tg' && req.method === 'POST') return await onUpdate(req, env);
+      if (url.pathname === '/tg' && req.method === 'POST') return await onUpdate(req, env, ctx);
       if (url.pathname === '/verify') return await onVerify(url, env);
       if (url.pathname === '/setup') return await onSetup(url, env);
+      if (url.pathname === '/hit' && req.method === 'POST') return await onHit(req, env);
+      if (url.pathname === '/report' && req.method === 'POST') return await onReport(req, env);
     } catch (e) {
       return new Response('error: ' + e.message, { status: 500 });
     }
@@ -49,7 +53,7 @@ async function memberStatus(env, uid) {
 
 const channelLink = env => 'https://t.me/' + String(env.CHANNEL).replace(/^@/, '');
 
-async function onUpdate(req, env) {
+async function onUpdate(req, env, ctx) {
   if (req.headers.get('x-telegram-bot-api-secret-token') !== (await hookSecret(env))) {
     return new Response('forbidden', { status: 403 });
   }
@@ -67,6 +71,28 @@ async function onUpdate(req, env) {
     const n = parseInt((msg.text.split(/\s+/)[1] || ''), 10);
     const res = await postDay(env, chat, n > 0 ? n - 1 : null);
     if (res !== 'ok') await api(env, 'sendMessage', { chat_id: chat, text: res });
+    return new Response('ok');
+  }
+  if (msg && /^\/ig\b/.test(msg.text || '')) {
+    // пробная публикация в Instagram: /ig [номер сцены]; ответ придёт сообщением в этот чат
+    if (!(await isChannelAdmin(env, from.id))) {
+      await api(env, 'sendMessage', { chat_id: chat, text: 'Публикация в Instagram доступна только администраторам канала.' });
+      return new Response('ok');
+    }
+    const n = parseInt((msg.text.split(/\s+/)[1] || ''), 10);
+    ctx.waitUntil((async () => {
+      const res = await postDay(env, chat, n > 0 ? n - 1 : null, { ig: true });
+      await api(env, 'sendMessage', { chat_id: chat, text: 'Instagram: ' + (res === 'ok' ? 'ролик опубликован.' : res) });
+    })());
+    return new Response('ok');
+  }
+  if (msg && /^\/stats\b/.test(msg.text || '')) {
+    if (!(await isChannelAdmin(env, from.id))) {
+      await api(env, 'sendMessage', { chat_id: chat, text: 'Статистика доступна только администраторам канала.' });
+      return new Response('ok');
+    }
+    const n = parseInt((msg.text.split(/\s+/)[1] || ''), 10);
+    await api(env, 'sendMessage', { chat_id: chat, text: await statsText(env, n > 0 && n <= 365 ? n : 7), parse_mode: 'HTML' });
     return new Response('ok');
   }
   if (msg &&!(msg.text || '').startsWith('/start') && !/доступ|игр/i.test(msg.text || '')) {
@@ -132,7 +158,7 @@ function nextPost(D, day) {
 }
 
 // i — номер публикации с нуля; без него берётся сегодняшняя (для пробного поста до старта — первая)
-async function postDay(env, chat, i) {
+async function postDay(env, chat, i, opts) {
   const D = await (await fetch(env.GAME_URL + 'day.json?' + Date.now())).json();
   const now = Date.now(), today = dayMSK(now);
   if (i == null) {
@@ -147,7 +173,8 @@ async function postDay(env, chat, i) {
     }
   }
   const d = D.days[i % D.days.length];
-  const caption = `🔎 <b>СЦЕНА ДНЯ · № ${i + 1}</b>\n` +
+  if (opts && opts.ig) return postInstagram(env, d, i, 5); // команда /ig: только Instagram
+  const caption =`🔎 <b>СЦЕНА ДНЯ · № ${i + 1}</b>\n` +
     `<i>из <a href="${env.GAME_URL}">«Книгоскопа»</a>, моей игры по русской литературе</i>\n\n` +
     `<b>${HOOKS[i % HOOKS.length]}</b>\n` +
     'Панорама поворачивается по кругу, присмотритесь к деталям. Ответ выбирайте в викторине ниже 👇\n\n' +
@@ -168,7 +195,133 @@ async function postDay(env, chat, i) {
     explanation: `${d.explanation} Следующая сцена выйдет ${nextPost(D, today)}.`.slice(0, 200),
     is_anonymous: true,
   });
-  return poll.ok ? 'ok' : 'Опрос не отправлен: ' + poll.description;
+  let res = poll.ok ? 'ok' : 'Опрос не отправлен: ' + poll.description;
+  // то же расписание и тот же ролик, но вертикальный и с голосом, уходит в Instagram
+  if (chat === env.CHANNEL && String(env.IG_ON) === '1') {
+    const ig = await postInstagram(env, d, i, 24);
+    if (ig !== 'ok') res += ' · ' + ig;
+  }
+  return res;
+}
+
+/* ---------- Instagram: Reels через Graph API ----------
+   Переменные воркера: IG_ON=1, IG_USER_ID (число — id профессионального аккаунта Instagram),
+   IG_TOKEN (секрет — бессрочный токен страницы Facebook, к которой привязан аккаунт).
+   Ролик берётся с сайта: img/day/<id>_v.mp4 (9:16, с голосом). Instagram сам скачивает его по ссылке. */
+const IG_API = 'https://graph.facebook.com/v21.0/';
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+async function igCall(env, path, params, get) {
+  const q = new URLSearchParams({ ...params, access_token: env.IG_TOKEN });
+  const r = await fetch(IG_API + path + (get ? '?' + q : ''), get ? {} : { method: 'POST', body: q });
+  return r.json();
+}
+// tries — сколько раз по 5 с проверять, обработал ли Instagram видео
+async function postInstagram(env, d, i, tries) {
+  if (!env.IG_USER_ID || !env.IG_TOKEN) return 'не заданы IG_USER_ID и IG_TOKEN';
+  const caption = `СЦЕНА ДНЯ · № ${i + 1}\n\n${HOOKS[i % HOOKS.length]}\n` +
+    `Панорама поворачивается по кругу, присмотритесь к деталям. В игре здесь ${hiddenDetails(d.spots)} из текста.\n\n` +
+    'Из какого произведения эта сцена? Пишите ответ в комментариях 👇\n\n' +
+    'Проверить себя можно в игре «Книгоскопъ»: ссылка в шапке профиля.\n\n' +
+    `#сцена_дня #книгоскоп #${d.grade}класс #литература #егэ #русскаялитература`;
+  const c = await igCall(env, env.IG_USER_ID + '/media', {
+    media_type: 'REELS', video_url: env.GAME_URL + 'img/day/' + d.id + '_v.mp4', caption, share_to_feed: 'true',
+  });
+  if (!c.id) return 'контейнер не создан: ' + (c.error ? c.error.message : JSON.stringify(c));
+  for (let k = 0; k < tries; k++) {
+    await sleep(5000);
+    const s = await igCall(env, c.id, { fields: 'status_code,status' }, true);
+    if (s.status_code === 'FINISHED') {
+      const p = await igCall(env, env.IG_USER_ID + '/media_publish', { creation_id: c.id });
+      return p.id ? 'ok' : 'публикация не удалась: ' + (p.error ? p.error.message : JSON.stringify(p));
+    }
+    if (s.status_code === 'ERROR' || s.status_code === 'EXPIRED') return 'Instagram не принял видео: ' + (s.status || s.status_code);
+  }
+  return 'видео ещё обрабатывается, публикация не выполнена';
+}
+
+/* ---------- анонимная статистика игры (D1): только счётчики по дням, без пользователей и адресов ---------- */
+const EVENTS = ['open', 'start', 'finish', 'print', 'install', 'report'];
+let schemaReady = false;
+async function db(env) {
+  if (!env.DB) return null;
+  if (!schemaReady) {
+    await env.DB.batch([
+      env.DB.prepare('CREATE TABLE IF NOT EXISTS events (day TEXT, ev TEXT, k TEXT, n INTEGER DEFAULT 0, PRIMARY KEY (day, ev, k))'),
+      env.DB.prepare('CREATE TABLE IF NOT EXISTS scenes (day TEXT, id TEXT, v INTEGER DEFAULT 0, n INTEGER DEFAULT 0, pl INTEGER DEFAULT 0, dr INTEGER DEFAULT 0, au INTEGER DEFAULT 0, ti INTEGER DEFAULT 0, sp INTEGER DEFAULT 0, PRIMARY KEY (day, id))'),
+    ]);
+    schemaReady = true;
+  }
+  return env.DB;
+}
+const today = () => new Date(Date.now() + 3 * 3600e3).toISOString().slice(0, 10); // день по Москве
+const corsH = env => ({ 'access-control-allow-origin': new URL(env.GAME_URL).origin, 'content-type': 'application/json' });
+const num = (v, max) => Math.max(0, Math.min(max, Math.round(+v || 0)));
+
+async function countEvent(env, ev, k) {
+  const D = await db(env); if (!D) return;
+  await D.prepare('INSERT INTO events (day, ev, k, n) VALUES (?, ?, ?, 1) ON CONFLICT (day, ev, k) DO UPDATE SET n = n + 1').bind(today(), ev, k).run();
+}
+
+async function onHit(req, env) {
+  let b; try { b = JSON.parse(await req.text()); } catch (e) { return new Response('bad', { status: 400 }); }
+  const ev = String(b.ev || ''), k = String(b.k || '');
+  if (!/^[\w-]{1,24}$/.test(k)) return new Response('bad', { status: 400 });
+  const D = await db(env); if (!D) return new Response('off', { headers: corsH(env) });
+  if (ev === 'view' || ev === 'ans') {
+    const a = ev === 'ans';
+    await D.prepare('INSERT INTO scenes (day, id, v, n, pl, dr, au, ti, sp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (day, id) DO UPDATE SET ' +
+      'v = v + excluded.v, n = n + excluded.n, pl = pl + excluded.pl, dr = dr + excluded.dr, au = au + excluded.au, ti = ti + excluded.ti, sp = sp + excluded.sp')
+      .bind(today(), k, a ? 0 : 1, a ? 1 : 0, a ? num(b.pl, 1500) : 0, a ? num(b.dr, 1000) : 0, a ? num(b.au, 1000) : 0, a ? num(b.ti, 1500) : 0, a ? num(b.sp, 20) : 0).run();
+  } else if (EVENTS.includes(ev) && ev !== 'report') {
+    await countEvent(env, ev, k);
+  } else return new Response('bad', { status: 400 });
+  return new Response('ok', { headers: corsH(env) });
+}
+
+// сообщение об ошибке из игры: уходит владельцу канала (он должен хотя бы раз написать боту)
+async function onReport(req, env) {
+  const H = corsH(env);
+  let b; try { b = JSON.parse(await req.text()); } catch (e) { return new Response('{"ok":false}', { headers: H }); }
+  const id = String(b.id || '').slice(0, 24), text = String(b.text || '').trim().slice(0, 600);
+  if (!/^[\w-]+$/.test(id) || text.length < 5) return new Response('{"ok":false}', { headers: H });
+  const adm = await api(env, 'getChatAdministrators', { chat_id: env.CHANNEL });
+  const owner = adm.ok && adm.result.find(m => m.status === 'creator');
+  if (!owner) return new Response('{"ok":false}', { headers: H });
+  const msg = '⚠️ Сообщение об ошибке в игре\n\n' +
+    'Сцена: «' + String(b.title || '').slice(0, 120) + '» (' + id + ')\n' +
+    (b.kind ? 'Где ошибка: ' + String(b.kind).slice(0, 40) + '\n' : '') + '\n' + text;
+  const r = await api(env, 'sendMessage', { chat_id: owner.user.id, text: msg, reply_markup: { inline_keyboard: [[{ text: 'Открыть сцену', url: env.GAME_URL + '?s=' + id }]] } });
+  if (r.ok) await countEvent(env, 'report', id).catch(() => {});
+  return new Response(JSON.stringify({ ok: !!r.ok }), { headers: H });
+}
+
+async function statsText(env, days) {
+  const D = await db(env);
+  if (!D) return 'Статистика не подключена: в Cloudflare у воркера нет привязки базы D1 с именем DB.';
+  const from = new Date(Date.now() + 3 * 3600e3 - (days - 1) * 864e5).toISOString().slice(0, 10);
+  const ev = (await D.prepare('SELECT ev, k, SUM(n) AS n FROM events WHERE day >= ? GROUP BY ev, k').bind(from).all()).results;
+  const sc = (await D.prepare('SELECT id, SUM(v) AS v, SUM(n) AS n, SUM(pl) AS pl, SUM(dr) AS dr, SUM(au) AS au, SUM(ti) AS ti, SUM(sp) AS sp FROM scenes WHERE day >= ? GROUP BY id').bind(from).all()).results;
+  const E = (e, k) => ev.filter(x => x.ev === e && (k == null || x.k === k || x.k.startsWith(k))).reduce((a, x) => a + x.n, 0);
+  const V = sc.reduce((a, x) => a + x.v, 0), N = sc.reduce((a, x) => a + x.n, 0);
+  const pc = (a, b) => b ? Math.round(100 * a / b) + '%' : '0%';
+  let names = {};
+  try { const G = await (await fetch(env.GAME_URL + 'day.json')).json(); names = Object.fromEntries(G.days.map(d => [d.id, d.options[d.correct]])); } catch (e) {}
+  const avg = x => (x.pl + x.dr + x.au + x.ti) / x.n;
+  const enough = sc.filter(x => x.n >= 3).sort((a, b) => avg(a) - avg(b));
+  const line = x => `«${names[x.id] || x.id}»: в среднем ${Math.round(avg(x))} очк., ответов ${x.n}`;
+  const T = sc.reduce((a, x) => a + x.ti, 0) / 1500, A = sc.reduce((a, x) => a + x.au, 0) / 1000, Dr = sc.reduce((a, x) => a + x.dr, 0) / 1000;
+  let t = `📊 <b>Книгоскопъ за ${days} ${days % 10 === 1 && days % 100 !== 11 ? 'день' : days % 10 >= 2 && days % 10 <= 4 && (days % 100 < 12 || days % 100 > 14) ? 'дня' : 'дней'}</b>\n\n` +
+    `Открытий игры: <b>${E('open')}</b> (по ссылке из «Сцены дня» ${E('open', 'day')}, по ссылке учителя ${E('open', 'set')}, с иконки на телефоне ${E('open', 'app')})\n` +
+    `Партий начато: <b>${E('start')}</b>, доиграно до итогов: <b>${E('finish')}</b> (${pc(E('finish'), E('start') - E('start', 'scene-slide') - E('start', 'hero-slide'))})\n` +
+    `Игр на слайде: ${E('start', 'scene-slide') + E('start', 'hero-slide')}, «Угадай героя»: ${E('start', 'hero')}\n` +
+    `Сцен открыто: ${V}, отвечено: ${N} (${pc(N, V)})\n` +
+    `Верно названо произведение: ${pc(Math.round(T), N)}, автор: ${pc(Math.round(A), N)}, направление: ${pc(Math.round(Dr), N)}\n` +
+    `Листов распечатано: ${E('print')}, установок на телефон: ${E('install')}, сообщений об ошибках: ${E('report')}`;
+  const hard = enough.slice(0, Math.min(5, Math.ceil(enough.length / 2))), easy = enough.slice(hard.length).reverse().slice(0, 5);
+  if (hard.length) t += '\n\n<b>Труднее всего</b>\n' + hard.map(line).join('\n');
+  if (easy.length) t += '\n\n<b>Легче всего</b>\n' + easy.map(line).join('\n');
+  if (!enough.length && N) t += '\n\nТрудные и лёгкие сцены появятся, когда на каждую придёт хотя бы 3 ответа.';
+  return t + '\n\nЗа другой срок: /stats 30';
 }
 
 /* ---------- сайт ---------- */

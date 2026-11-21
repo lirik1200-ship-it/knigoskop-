@@ -6,6 +6,11 @@
 <meta name="description" content="Книгоскопъ — игра по русской литературе: узнайте произведение по сцене.">
 <meta name="theme-color" content="#000000">
 <link rel="icon" href="img/favicon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="img/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Книгоскопъ">
 <style>[hidden]{display:none!important}body{margin:0}
 /* ---------- grade picker ---------- */
 .grade-row{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));width:100%;border:1px solid var(--ink);margin-top:calc(-1 * var(--s-sm));}
@@ -537,6 +542,64 @@ body:has(#intro:not([hidden]) #stepMode:not([hidden])):not(:has(.panel:not([hidd
 .menu .menu-ext{border-top:1px solid var(--ink);}
 @media (max-width:430px){.menu-btn,.menu{right:var(--s-md);}.top{padding-right:calc(var(--s-md) + 44px);}}
 @media (min-width:760px){.menu-btn,.menu{right:var(--s-2xl);}.top{padding-right:calc(var(--s-2xl) + 44px);}}
+/* ---------- сообщить об ошибке (экран результата) ---------- */
+.report{border-top:1px solid var(--hairline);padding-top:var(--s-md);}
+.report-link{font-family:var(--ui);font-size:14px;font-weight:600;color:var(--body);text-decoration:underline;text-underline-offset:3px;}
+.report-link:hover{color:var(--ink);}
+.report-form{display:flex;flex-direction:column;gap:var(--s-md);margin-top:var(--s-sm);}
+.report-form h3{margin:0;font-family:var(--ui);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;}
+.rep-kinds{display:flex;flex-wrap:wrap;gap:6px;}
+.rep-kinds button{padding:7px 12px;border:1px solid var(--ink);font-family:var(--ui);font-size:13px;font-weight:600;}
+.rep-kinds button[aria-pressed="true"]{background:var(--ink);color:var(--canvas);}
+.report-form textarea{font-size:16px;resize:vertical;min-height:84px;}
+.report .msg.ok,.msg.ok{color:var(--ok);}
+body.present .report{display:none!important;}
+/* ---------- установка на телефон ---------- */
+.steps{margin:var(--s-sm) 0 0;padding-left:22px;font-family:var(--serif);font-size:16px;line-height:1.6;color:var(--ink);}
+/* ---------- печатный лист: на экране не виден, печатается только он ---------- */
+#printSheet{display:none;}
+.pr-opts{display:flex;flex-direction:column;gap:10px;margin-top:var(--s-md);}
+@media print{
+  @page{size:A4;margin:12mm 12mm 16mm;}
+  html,body{height:auto!important;overflow:visible!important;background:#fff!important;}
+  body>*:not(#printSheet){display:none!important;}
+  #printSheet{display:block;color:#000;font-family:var(--serif);-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .ps-head{display:flex;align-items:center;gap:4mm;padding-bottom:3mm;border-bottom:.6mm solid #000;}
+  .ps-head img{width:13mm;height:13mm;}
+  .ps-brand{font-family:var(--display);font-size:22pt;line-height:1;}
+  .ps-title{margin-left:auto;text-align:right;font-family:var(--ui);font-size:10pt;font-weight:700;letter-spacing:.06em;text-transform:uppercase;max-width:95mm;}
+  .ps-who{display:flex;gap:6mm;margin:4mm 0 1mm;font-family:var(--ui);font-size:9.5pt;}
+  .ps-who span{flex:1;display:flex;gap:2mm;align-items:flex-end;white-space:nowrap;}
+  .ps-who span i{flex:1;border-bottom:.3mm solid #000;height:5mm;}
+  .ps-who span.sm{flex:.45;}
+  .ps-task{margin:3mm 0 0;font-size:10pt;color:#333;}
+  .ps-scene{break-inside:avoid;margin-top:6mm;}
+  .ps-scene h2{display:flex;align-items:baseline;gap:3mm;margin:0 0 2.5mm;font-family:var(--ui);font-size:9pt;font-weight:700;letter-spacing:.16em;text-transform:uppercase;}
+  .ps-scene h2 b{font-family:var(--display);font-weight:400;font-size:20pt;letter-spacing:0;}
+  .ps-body{display:grid;grid-template-columns:112mm 1fr;gap:5mm;}
+  .ps-body img{width:100%;aspect-ratio:16/9;object-fit:cover;border:.3mm solid #000;display:block;}
+  .ps-fields{display:flex;flex-direction:column;justify-content:space-between;}
+  .ps-f{font-family:var(--ui);font-size:8pt;font-weight:700;letter-spacing:.1em;text-transform:uppercase;}
+  .ps-f i{display:block;height:9mm;border-bottom:.3mm solid #000;}
+  .ps-dirs{display:flex;flex-wrap:wrap;gap:1.5mm 4.5mm;margin-top:3.5mm;font-family:var(--ui);font-size:9pt;}
+  .ps-dirs b{font-size:8pt;letter-spacing:.1em;text-transform:uppercase;margin-right:1mm;}
+  .ps-dirs span::before{content:"";display:inline-block;width:3mm;height:3mm;border:.3mm solid #000;margin-right:1.4mm;vertical-align:-.3mm;}
+  .ps-det{margin-top:3mm;font-family:var(--ui);font-size:8pt;font-weight:700;letter-spacing:.1em;text-transform:uppercase;}
+  .ps-det i{display:block;height:7.5mm;border-bottom:.3mm solid #999;}
+  .ps-two .ps-scene:nth-of-type(2n+1):not(:first-of-type){break-before:page;}
+  .ps-one .ps-scene{break-before:page;margin-top:0;}
+  .ps-one .ps-scene:first-of-type{break-before:auto;margin-top:6mm;}
+  .ps-one .ps-body{grid-template-columns:1fr;}
+  .ps-one .ps-fields{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5mm;}
+  .ps-one .ps-det i{height:9mm;}
+  .ps-key{break-before:page;}
+  .ps-key h2{margin:0 0 4mm;font-family:var(--display);font-weight:400;font-size:24pt;border-bottom:.6mm solid #000;padding-bottom:2mm;}
+  .ps-key table{width:100%;border-collapse:collapse;font-size:9.5pt;}
+  .ps-key th{text-align:left;font-family:var(--ui);font-size:7.5pt;letter-spacing:.1em;text-transform:uppercase;border-bottom:.3mm solid #000;padding:1.5mm 2mm;}
+  .ps-key td{border-bottom:.2mm solid #bbb;padding:2mm;vertical-align:top;}
+  .ps-key td:first-child{font-family:var(--display);font-size:13pt;width:8mm;}
+  .ps-foot{display:flex;justify-content:space-between;margin-top:6mm;padding-top:2mm;border-top:.3mm solid #000;font-family:var(--ui);font-size:7.5pt;letter-spacing:.06em;color:#555;break-inside:avoid;}
+}
 /* командная игра на слайде */
 .pbar{position:absolute;left:0;right:0;bottom:0;z-index:5;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;padding:12px 18px calc(12px + env(safe-area-inset-bottom,0px));background:rgba(10,10,10,.93);color:#fff;border-top:1px solid #333;}
 .pteam{display:flex;align-items:center;gap:12px;min-width:0;}
@@ -681,6 +744,16 @@ body.present #resTiles,body.present .legend,body.present .rrow .p{display:none!i
       <div class="ledger" id="resTiles"></div>
       <div class="mapbox small" id="resMap"></div>
       <div class="legend"><span><i style="background:var(--wax)"></i>ваш ответ</span><span><i style="background:var(--ok)"></i>верное место</span></div>
+      <div class="report" id="repBox">
+        <button class="report-link" id="repOpen" type="button">Нашли ошибку в этой сцене? Сообщите автору</button>
+        <div class="report-form" id="repForm" hidden>
+          <h3>Где ошибка?</h3>
+          <div class="rep-kinds" id="repKinds"><button type="button" aria-pressed="false">Цитата</button><button type="button" aria-pressed="false">Место</button><button type="button" aria-pressed="false">Автор или название</button><button type="button" aria-pressed="false">Картинка</button><button type="button" aria-pressed="false">Другое</button></div>
+          <textarea class="txt-in" id="repText" maxlength="600" rows="3" placeholder="Что не так? Например: эта цитата из другой главы"></textarea>
+          <div class="prow"><button class="pbtn ghost" id="repCancel" type="button">Отмена</button><button class="pbtn" id="repSend" type="button">Отправить</button></div>
+          <p class="msg" id="repMsg"></p>
+        </div>
+      </div>
       <div class="next-row"><button class="seal-btn" id="btnNext">Следующая глава</button></div>
     </article>
   </div>
@@ -776,7 +849,7 @@ body.present #resTiles,body.present .legend,body.present .rrow .p{display:none!i
   <div class="screen panel" id="tsPanel" hidden><article class="page">
     <button class="back-link" data-closep type="button">← Назад</button>
     <h2>Кабинет учителя</h2>
-    <div class="hub-tabs" id="hubTabs"><button class="on" data-tab="set" type="button">Набор</button><button data-tab="class" type="button">Классу</button><button data-tab="slide" type="button">На слайде</button></div>
+    <div class="hub-tabs" id="hubTabs"><button class="on" data-tab="set" type="button">Набор</button><button data-tab="class" type="button">Классу</button><button data-tab="slide" type="button">На слайде</button><button data-tab="print" type="button">Лист</button></div>
     <section class="hub-tab" data-tab="set">
       <p class="note">Отметьте, что должно выпасть ученикам. Набор сохраняется в этом браузере и нужен для ссылки и для игры на слайде.</p>
       <div class="seg" id="tsMode"><button data-m="scene" type="button">Сцены<small id="tsMcScene"></small></button><button data-m="hero" type="button">Герои<small id="tsMcHero"></small></button></div>
@@ -804,6 +877,19 @@ body.present #resTiles,body.present .legend,body.present .rrow .p{display:none!i
         <li><kbd>1</kbd> / <kbd>2</kbd> — +1 очко команде, с <kbd>Shift</kbd> — +3</li>
         <li>Подойдёт пульт для презентаций: он нажимает стрелки и пробел</li>
       </ul>
+    </section>
+    <section class="hub-tab" data-tab="print" hidden>
+      <p class="note">Лист для урока без телефонов: кадр каждой позиции из набора и поля для ответов. В окне печати выберите «Сохранить как PDF» или сразу отправьте лист на принтер.</p>
+      <div class="fld"><label for="prTitle">Заголовок листа</label><input class="txt-in" id="prTitle" maxlength="70" autocomplete="off" placeholder="10 «Б», проверочная по Гончарову"></div>
+      <div class="fld"><label>Сколько на странице</label></div>
+      <div class="seg" id="prLayout"><button class="on" data-l="2" type="button">Две<small>экономно</small></button><button data-l="1" type="button">Одна<small>крупный кадр</small></button></div>
+      <div class="pr-opts">
+        <label class="toggle"><input type="checkbox" id="prName" checked> Строка для имени и класса</label>
+        <label class="toggle"><input type="checkbox" id="prKey" checked> Лист с ответами для учителя в конце</label>
+      </div>
+      <p class="note" id="prSum"></p>
+      <p class="msg" id="prMsg"></p>
+      <button class="go-btn" id="prGo" type="button"><span>Скачать PDF</span><span class="arr">↓</span></button>
     </section>
   </article></div>
 
@@ -848,8 +934,19 @@ body.present #resTiles,body.present .legend,body.present .rrow .p{display:none!i
     <button type="button" data-go="hero">Угадай героя<small>новая партия</small></button>
     <button type="button" data-go="lib">Моя библиотека</button>
     <button type="button" data-go="teacher">Кабинет учителя</button>
+    <button type="button" data-go="install" id="menuInstall">Установить на телефон<small>иконка на экране</small></button>
     <a class="menu-ext" href="https://t.me/egeminkin" target="_blank" rel="noopener">Канал автора<small>Telegram ↗</small></a>
   </nav>
+
+  <div class="screen panel" id="installPanel" hidden><article class="page">
+    <h2>Книгоскопъ на телефоне</h2>
+    <p class="note">Игра будет открываться с экрана телефона, как приложение, без адресной строки.</p>
+    <h3>iPhone и iPad</h3>
+    <ol class="steps"><li>Откройте игру в Safari.</li><li>Нажмите кнопку «Поделиться» внизу экрана.</li><li>Выберите «На экран „Домой“» и нажмите «Добавить».</li></ol>
+    <h3>Android</h3>
+    <ol class="steps"><li>Откройте игру в Chrome.</li><li>Нажмите ⋮ в правом верхнем углу.</li><li>Выберите «Установить приложение» или «Добавить на главный экран».</li></ol>
+    <div class="prow"><button class="pbtn" data-closep type="button">Понятно</button></div>
+  </article></div>
 
   <div class="gate" id="gate" hidden>
     <div class="gate-card">
@@ -1956,6 +2053,7 @@ function newGame(mode,opts){
   S = {r:0, total:0, results:[], list, authorOrder:shuffle(AUTHORS), teams:opts.teams?opts.teams.map(n=>({n,score:0})):null, lesson:opts.lesson||null, present:!!opts.present};
   document.body.classList.toggle('present',S.present); $('pbar').hidden=!S.present; $('pexit').hidden=!S.present;
   buildAuthors();
+  if(!BOOT) track('start',(list[0]&&list[0].hero?'hero':'scene')+(S.present?'-slide':S.lesson?'-lesson':LESSON?'-set':''));
   startRound();
 }
 function blankAnswer(){return {place:null, dir:null, author:null, title:'', hero:''};}
@@ -1981,7 +2079,9 @@ function zoomPano(f,cx,cy){
 }
 function clampPano(){const H=pano.clientHeight;if(P.flat){const m=mastH(),h=H-m;P.y=P.h<=h?m+(h-P.h)/2:Math.min(m,Math.max(H-P.h,P.y));return;}P.y = P.h<=H ? (H-P.h)/2 : Math.min(0,Math.max(H-P.h,P.y));}
 function applyPano(){ if(!P.w) return; if(P.flat){const W=pano.clientWidth; P.x=P.w<=W?(W-P.w)/2:Math.min(0,Math.max(W-P.w,P.x)); strip.style.transform=`translate3d(${P.x-P.w}px,${P.y}px,0)`; return;} const o=((P.x%P.w)+P.w)%P.w; strip.style.transform=`translate3d(${o-P.w}px,${P.y}px,0)`;}
+let BOOT=false; // фоновая партия при открытии страницы: панорамы не грузим, пока игрок не нажал «Играть»
 function loadScene(R){
+  if(BOOT){drawSpots(R);return;}
   strip.classList.add('loading'); P.z=1; P.flat=!!R.hero; tiles[0].style.visibility=tiles[2].style.visibility=P.flat?'hidden':''; $('dragHint').classList.toggle('zoomy',P.flat); $('dragTxt').textContent=P.flat?'Приближайте, чтобы рассмотреть детали':'Потяните, чтобы осмотреться';
   const src=R.img.replace('/s_','/l_');
   img.onload=()=>{imgs.slice(1).forEach(i=>i.src=src);layoutPano(false);strip.classList.remove('loading');P.idle=true;$('dragHint').classList.remove('gone');};
@@ -2180,7 +2280,8 @@ function startRound(){
   $('placeInput').value=''; $('titleInput').value=''; markAuthor(); setDir(null); updateChips(); closeSheets();
   if(M.svg){M.vb={x:0,y:0,w:MAP.w,h:MAP.h};applyVB();}
   S.found=new Set(); loadScene(R);
-  const nx=S.list[S.r+1]; if(nx){const p=new Image();p.src=nx.img.replace('/s_','/l_');}
+  const nx=S.list[S.r+1]; if(nx&&!BOOT){const p=new Image();p.src=nx.img.replace('/s_','/l_');}
+  if(!BOOT&&!S.present) track('view',R.id);
   $('result').hidden=true;$('final').hidden=true;
   if(S.present) renderPbar();
 }
@@ -2226,6 +2327,7 @@ function submit(){
   const sp=null;
   const sum=pl.pts+dr.pts+ar.pts+tr.pts; addPts(sum); S.results.push({R,sum,team:S.teams?S.r%2:null}); if(tr.pts>0&&!R.hero) libAdd(R.id); saveLesson();
   showResult(R,{pl,dr,ar,tr,sp,sum});
+  track('ans',R.id,{pl:pl.pts,dr:dr.pts,au:ar.pts,ti:tr.pts,sp:S.found.size});
 }
 function showResult(R,x){
   const au=AUTHORS.find(a=>a.id===R.author);
@@ -2243,7 +2345,7 @@ function showResult(R,x){
   $('resTiles').innerHTML=row(R.hero?'Герой':'Место',x.pl,MAX.place)+row('Направление',x.dr,MAX.dir)+row('Автор',x.ar,MAX.author)+row('Название',x.tr,MAX.title)+(x.sp?row('Детали сцены',x.sp,x.sp.max):'')+`<div class="lrow sum"><span class="lab">Итого за главу</span><span class="pts">${fmt(x.sum)} <small>из ${fmt(mx)}</small></span></div>`;
   $('btnNext').textContent = S.r+1<S.list.length?(S.list[S.r+1].hero?'Следующий герой':'Следующая глава'):'Итоги';
   scoreLine(); renderEge(R);
-  $('result').hidden=false; $('result').scrollTop=0;
+  repReset(); $('result').hidden=false; $('result').scrollTop=0;
   const noMap=!!(R.noPlace||R.hero); $('resMap').hidden=noMap; document.querySelector('.legend').hidden=noMap; if(!noMap) drawResultMap(R,x.pl);
 }
 function drawResultMap(R,pl){
@@ -2267,6 +2369,7 @@ function drawResultMap(R,pl){
 }
 $('btnNext').onclick=()=>{S.r++; if(S.r<S.list.length) startRound(); else showFinal();};
 function showFinal(){
+  if(!S.present) track('finish',S.list[0]&&S.list[0].hero?'hero':'scene');
   $('finTotal').textContent=fmt(S.total);
   const mx=S.list.reduce((a,R)=>a+roundMax(R),0), t=S.total/mx; $('finOf').textContent='из '+fmt(mx); $('finRank').textContent = t>=0.83?'Магистр словесности':t>=0.6?'Знаток русской литературы':t>=0.33?'Внимательный читатель':'Читатель-новичок';
   $('finList').innerHTML=S.results.map((r,i)=>`<div class="rrow"><img src="${thumb(r.R)}" alt=""><span class="t">${r.R.hero?esc(r.R.heroName)+' · ':''}«${r.R.title}»<small>${AUTHORS.find(a=>a.id===r.R.author).name} · ${DIRS[r.R.dir]}</small></span><span class="p">${fmt(r.sum)}</span></div>`).join('');
@@ -2629,6 +2732,7 @@ document.addEventListener('click',e=>{ if(!$('menu').hidden&&!e.target.closest('
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!$('menu').hidden){ menuOpen(false); $('menuBtn').focus(); } });
 $('menu').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{ const g=b.dataset.go; menuOpen(false);
   if(g==='lib'){ openLib(); return; }
+  if(g==='install'){ if(INSTALL){ INSTALL.prompt(); INSTALL.userChoice.finally(()=>{INSTALL=null;}); } else { $('installPanel').hidden=false; $('installPanel').scrollTop=0; } return; }
   if(!goHome()) return;
   if(g==='scene'||g==='hero') document.querySelector('[data-mode="'+g+'"]').click();
   else if(g==='teacher') openTeacherSet(MODE); });
@@ -2640,13 +2744,72 @@ addEventListener('keydown',e=>{
   else if(e.code==='KeyD'){pDetail();}
 });
 
+
+/* --- анонимная статистика: только события игры, без имён, адресов и меток пользователя --- */
+const API_BASE='https://knigoskop.lirik1200.workers.dev';
+const TRACK=/github\.io$/.test(location.hostname);
+function track(ev,k,v){ try{ if(!TRACK) return; navigator.sendBeacon(API_BASE+'/hit',JSON.stringify(Object.assign({ev,k},v||{}))); }catch(e){} }
+track('open',matchMedia('(display-mode: standalone)').matches?'app':DAYNO?'day':LESSON?'set':'direct');
+
+/* --- сообщить об ошибке: сообщение уходит автору в Telegram через бота --- */
+function repReset(){ $('repForm').hidden=true; $('repOpen').hidden=false; $('repText').value=''; $('repMsg').textContent=''; $('repMsg').className='msg';
+  $('repSend').disabled=false; $('repKinds').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed','false')); }
+$('repOpen').onclick=()=>{ $('repOpen').hidden=true; $('repForm').hidden=false; $('repText').focus(); };
+$('repCancel').onclick=repReset;
+$('repKinds').querySelectorAll('button').forEach(b=>b.onclick=()=>{ const on=b.getAttribute('aria-pressed')!=='true';
+  $('repKinds').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed','false')); b.setAttribute('aria-pressed',on); });
+$('repSend').onclick=()=>{ const m=$('repMsg'), R=S&&S.list[S.r], text=$('repText').value.trim(), kb=$('repKinds').querySelector('[aria-pressed="true"]');
+  m.className='msg'; if(!R) return;
+  if(text.length<5){ m.textContent='Напишите хотя бы пару слов о том, что не так.'; $('repText').focus(); return; }
+  $('repSend').disabled=true; m.textContent='Отправляю…';
+  fetch(API_BASE+'/report',{method:'POST',body:JSON.stringify({id:R.id,title:R.hero?R.heroName+' · '+R.title:R.title,kind:kb?kb.textContent:'',text})})
+    .then(r=>r.json()).then(d=>{ if(!d.ok) throw 0; m.className='msg ok'; m.textContent='Спасибо! Сообщение отправлено автору игры.'; $('repText').value=''; })
+    .catch(()=>{ $('repSend').disabled=false; m.textContent='Не получилось отправить. Проверьте интернет и попробуйте ещё раз.'; }); };
+
+/* --- печатный лист по набору --- */
+let PRL='2';
+document.querySelectorAll('#prLayout button').forEach(b=>b.onclick=()=>{PRL=b.dataset.l;document.querySelectorAll('#prLayout button').forEach(x=>x.classList.toggle('on',x===b));prSum();});
+function prSum(){ const n=tsSel().length, pages=Math.ceil(n/(+PRL))+($('prKey').checked&&n?1:0);
+  $('prSum').textContent=n?'В листе: '+n+' '+tsWord(n)+', '+pages+' '+(pages%10===1&&pages%100!==11?'страница':pages%10>=2&&pages%10<=4&&(pages%100<12||pages%100>14)?'страницы':'страниц')+' A4.':'Сначала отметьте сцены или героев на вкладке «Набор».'; }
+$('prKey').onchange=prSum;
+document.querySelector('#hubTabs [data-tab="print"]').addEventListener('click',prSum);
+$('prGo').onclick=async()=>{
+  const ids=tsSel(), m=$('prMsg'); m.className='msg'; m.textContent='';
+  if(!ids.length){ m.textContent='Отметьте хотя бы одну позицию на вкладке «Набор».'; return; }
+  const list=ids.map(id=>tsPool().find(R=>R.id===id)).filter(Boolean), H=TSMODE==='hero';
+  const title=$('prTitle').value.trim(), date=new Date().toLocaleDateString('ru-RU');
+  const dirs='<b>Направление</b>'+DIRS.map(d=>`<span>${d}</span>`).join('');
+  let h=`<div class="${PRL==='1'?'ps-one':'ps-two'}"><header class="ps-head"><img src="img/emblem.png" alt=""><span class="ps-brand">Книгоскопъ</span><span class="ps-title">${esc(title||(H?'Угадай героя':'Угадай сцену'))}</span></header>`;
+  if($('prName').checked) h+=`<div class="ps-who"><span>Имя и фамилия <i></i></span><span class="sm">Класс <i></i></span><span class="sm">Дата <i></i></span></div>`;
+  h+=`<p class="ps-task">${H?'Все вещи на картинке принадлежат одному литературному герою. Назовите героя, произведение и автора, отметьте направление.':'Узнайте произведение по сцене. Назовите место действия, автора и название, отметьте направление.'}</p>`;
+  list.forEach((R,i)=>{ h+=`<section class="ps-scene"><h2><b>${i+1}</b>${H?'Герой':'Сцена'}</h2><div class="ps-body"><img src="${R.img}" alt=""><div class="ps-fields">`+
+    `<div class="ps-f">${H?'Герой':'Место действия'}<i></i></div><div class="ps-f">Автор<i></i></div><div class="ps-f">Название<i></i></div></div></div>`+
+    `<div class="ps-dirs">${dirs}</div><div class="ps-det">Какие детали подсказали ответ<i></i><i></i>${PRL==='1'?'<i></i><i></i>':''}</div></section>`; });
+  const foot=`<footer class="ps-foot"><span>Книгоскопъ · игра по русской литературе · Кирилл Минкин</span><span>${date}</span></footer>`;
+  h+=foot+'</div>';
+  if($('prKey').checked){ h+=`<section class="ps-key"><h2>Ответы</h2><table><tr><th>№</th><th>Произведение</th><th>Автор</th><th>${H?'Герой':'Место'}</th><th>Направление</th></tr>`+
+    list.map((R,i)=>`<tr><td>${i+1}</td><td>«${esc(R.title)}»</td><td>${esc(AUTHORS.find(a=>a.id===R.author).name)}</td><td>${esc(H?R.heroName:R.place)}</td><td>${DIRS[R.dir]}</td></tr>`).join('')+'</table>'+foot+'</section>'; }
+  const box=$('printSheet'); box.innerHTML=h; m.className='msg ok'; m.textContent='Готовлю лист…';
+  await Promise.all([...box.querySelectorAll('img')].map(im=>im.complete?0:new Promise(r=>{im.onload=im.onerror=r;})));
+  await document.fonts.ready; m.textContent=''; track('print',TSMODE,{n:list.length}); window.print();
+};
+addEventListener('afterprint',()=>{ $('printSheet').innerHTML=''; });
+
+/* --- установка на телефон: офлайн-кэш и иконка на экране --- */
+let INSTALL=null;
+const STANDALONE=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+$('menuInstall').hidden=STANDALONE;
+addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); INSTALL=e; });
+addEventListener('appinstalled',()=>{ INSTALL=null; $('menuInstall').hidden=true; track('install','app'); });
+if('serviceWorker' in navigator && /^https:$/.test(location.protocol)) addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+
 $('btnCreate').onclick=createLesson;
 $('btnPickAll').onclick=()=>{const b=[...$('scenePick').querySelectorAll('input')],on=b.some(i=>!i.checked);b.forEach(i=>i.checked=on);};
 document.querySelectorAll('[data-closep]').forEach(b=>b.onclick=()=>{b.closest('.panel').hidden=true;});
 initCaps();
 
 initMap();
-newGame(6);
+BOOT=true; newGame(6); BOOT=false;
 drawRuler();
 </script>
 
@@ -2691,5 +2854,6 @@ drawRuler();
   }).catch(()=>{ if(Date.now()-last<GRACE){gate.hidden=true;return;} show('Нет связи с сервером. Проверьте интернет и обновите страницу.');});
 })();
 </script>
+<div id="printSheet"></div>
 </body>
 </html>
