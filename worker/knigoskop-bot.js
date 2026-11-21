@@ -6,7 +6,7 @@
 //   SIGN_KEY  — секрет, любая длинная случайная строка (подпись ссылок доступа)
 //   CHANNEL   — переменная, например @egeminkin
 //   GAME_URL  — переменная, например https://lirik1200-ship-it.github.io/knigoskop-/
-//   DAY_ON    — переменная, 1 = публиковать «Сцену дня» в канал по расписанию (Settings → Triggers → Cron)
+//   DAY_ON    — переменная, 1 = публиковать «Сцену дня» (Cron `0 14 * * *` каждый день = 17:00 МСК; дни недели берутся из day.json)
 // Бот должен быть администратором канала, иначе Telegram не покажет ему подписчиков.
 
 const TTL = 30 * 24 * 3600; // ссылка доступа живёт 30 дней; подписка всё равно перепроверяется при входе
@@ -110,11 +110,28 @@ const hiddenDetails = n => {
   return a >= 2 && a <= 4 && (b < 12 || b > 14) ? `спрятаны ${n} детали` : `спрятано ${n} деталей`;
 };
 
-// i — номер дня с нуля; без него берётся сегодняшний (для пробного поста до старта — первый)
+// расписание в day.json: start — первый день публикаций, weekdays — дни недели (0 = вс, 1 = пн … 6 = сб)
+const WD = ['в воскресенье', 'в понедельник', 'во вторник', 'в среду', 'в четверг', 'в пятницу', 'в субботу'];
+const dayUTC = t => Math.floor(t / 864e5);
+const isPostDay = (D, day) => (D.weekdays || [0, 1, 2, 3, 4, 5, 6]).includes((day + 4) % 7); // 1 янв 1970 — четверг
+// номер публикации (с нуля) для даты day; -1, если до старта
+function postIndex(D, day) {
+  let n = -1;
+  for (let x = dayUTC(Date.parse(D.start)); x <= day; x++) if (isPostDay(D, x)) n++;
+  return n;
+}
+function nextPostWord(D, day) {
+  for (let x = day + 1; x <= day + 7; x++) if (isPostDay(D, x)) return x === day + 1 ? 'завтра' : WD[(x + 4) % 7];
+  return 'скоро';
+}
+
+// i — номер публикации с нуля; без него берётся сегодняшняя (для пробного поста до старта — первая)
 async function postDay(env, chat, i) {
   const D = await (await fetch(env.GAME_URL + 'day.json?' + Date.now())).json();
+  const today = dayUTC(Date.now());
   if (i == null) {
-    i = Math.floor((Date.now() - Date.parse(D.start)) / 864e5);
+    if (chat === env.CHANNEL && !isPostDay(D, today)) return 'Сегодня не день публикации';
+    i = postIndex(D, today);
     if (i < 0) {
       if (chat === env.CHANNEL) return 'Сцены дня ещё не начались';
       i = 0;
@@ -139,7 +156,7 @@ async function postDay(env, chat, i) {
     options: d.options.map(text => ({ text })),
     type: 'quiz',
     correct_option_id: d.correct,
-    explanation: d.explanation,
+    explanation: `${d.explanation} Следующая сцена — ${nextPostWord(D, today)} в ${D.time || '17:00'}.`.slice(0, 200),
     is_anonymous: true,
   });
   return poll.ok ? 'ok' : 'Опрос не отправлен: ' + poll.description;
@@ -166,7 +183,7 @@ async function onSetup(url, env) {
   if (me.ok) {
     const adm = await api(env, 'getChatMember', { chat_id: env.CHANNEL, user_id: me.result.id });
     lines.push(adm.ok && adm.result.status === 'administrator'
-      ? 'Бот — администратор канала ' + env.CHANNEL + '. Всё готово.'
+      ? 'Бот — администратор канала ' + env.CHANNEL + (adm.result.can_post_messages ? ', может публиковать посты. Всё готово.' : ', но без права «Публикация сообщений» — включите его, иначе «Сцена дня» не выйдет.')
       : 'Бот ещё не администратор канала ' + env.CHANNEL + ' — добавьте его в администраторы.');
   }
   return new Response(lines.join('\n'), { headers: { 'content-type': 'text/plain; charset=utf-8' } });
