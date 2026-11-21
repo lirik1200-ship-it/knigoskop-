@@ -6,7 +6,7 @@
 //   SIGN_KEY  — секрет, любая длинная случайная строка (подпись ссылок доступа)
 //   CHANNEL   — переменная, например @egeminkin
 //   GAME_URL  — переменная, например https://lirik1200-ship-it.github.io/knigoskop-/
-//   DAY_ON    — переменная, 1 = публиковать «Сцену дня» (Cron `0 14 * * *` каждый день = 17:00 МСК; дни недели берутся из day.json)
+//   DAY_ON    — переменная, 1 = публиковать «Сцену дня» (Cron `0 11,14 * * *` = 14:00 и 17:00 МСК; дни и время берутся из day.json)
 // Бот должен быть администратором канала, иначе Telegram не покажет ему подписчиков.
 
 const TTL = 30 * 24 * 3600; // ссылка доступа живёт 30 дней; подписка всё равно перепроверяется при входе
@@ -110,27 +110,36 @@ const hiddenDetails = n => {
   return a >= 2 && a <= 4 && (b < 12 || b > 14) ? `спрятаны ${n} детали` : `спрятано ${n} деталей`;
 };
 
-// расписание в day.json: start — первый день публикаций, weekdays — дни недели (0 = вс, 1 = пн … 6 = сб)
+// расписание в day.json: start — первый день публикаций, schedule — {день недели: время по Москве}
+// (0 = вс, 1 = пн … 6 = сб). Cron срабатывает в 14:00 и 17:00 МСК (`0 11,14 * * *`), поэтому время — одно из этих двух.
 const WD = ['в воскресенье', 'в понедельник', 'во вторник', 'в среду', 'в четверг', 'в пятницу', 'в субботу'];
-const dayUTC = t => Math.floor(t / 864e5);
-const isPostDay = (D, day) => (D.weekdays || [0, 1, 2, 3, 4, 5, 6]).includes((day + 4) % 7); // 1 янв 1970 — четверг
+const MSK = 3 * 3600e3;
+const dayMSK = t => Math.floor((t + MSK) / 864e5);
+const weekday = day => (day + 4) % 7; // 1 янв 1970 — четверг
+const postTime = (D, day) => (D.schedule || {})[weekday(day)];
 // номер публикации (с нуля) для даты day; -1, если до старта
 function postIndex(D, day) {
   let n = -1;
-  for (let x = dayUTC(Date.parse(D.start)); x <= day; x++) if (isPostDay(D, x)) n++;
+  for (let x = dayMSK(Date.parse(D.start)); x <= day; x++) if (postTime(D, x)) n++;
   return n;
 }
-function nextPostWord(D, day) {
-  for (let x = day + 1; x <= day + 7; x++) if (isPostDay(D, x)) return x === day + 1 ? 'завтра' : WD[(x + 4) % 7];
-  return 'скоро';
+function nextPost(D, day) {
+  for (let x = day + 1; x <= day + 7; x++) {
+    const t = postTime(D, x);
+    if (t) return (x === day + 1 ? 'завтра' : WD[weekday(x)]) + ' в ' + t;
+  }
+  return 'в ближайшие дни';
 }
 
 // i — номер публикации с нуля; без него берётся сегодняшняя (для пробного поста до старта — первая)
 async function postDay(env, chat, i) {
   const D = await (await fetch(env.GAME_URL + 'day.json?' + Date.now())).json();
-  const today = dayUTC(Date.now());
+  const now = Date.now(), today = dayMSK(now);
   if (i == null) {
-    if (chat === env.CHANNEL && !isPostDay(D, today)) return 'Сегодня не день публикации';
+    if (chat === env.CHANNEL) {
+      const t = postTime(D, today), hour = new Date(now + MSK).getUTCHours();
+      if (!t || parseInt(t, 10) !== hour) return 'Сейчас не время публикации';
+    }
     i = postIndex(D, today);
     if (i < 0) {
       if (chat === env.CHANNEL) return 'Сцены дня ещё не начались';
@@ -139,7 +148,7 @@ async function postDay(env, chat, i) {
   }
   const d = D.days[i % D.days.length];
   const caption = `🔎 <b>СЦЕНА ДНЯ · № ${i + 1}</b>\n` +
-    `<i>из <a href="${env.GAME_URL}">«Книгоскопа»</a> — моей игры по русской литературе</i>\n\n` +
+    `<i>из <a href="${env.GAME_URL}">«Книгоскопа»</a>, моей игры по русской литературе</i>\n\n` +
     `<b>${HOOKS[i % HOOKS.length]}</b>\n` +
     'Панорама поворачивается по кругу, присмотритесь к деталям. Ответ выбирайте в викторине ниже 👇\n\n' +
     `В игре здесь ${hiddenDetails(d.spots)} из текста. Сколько найдёте вы?\n\n` +
@@ -156,7 +165,7 @@ async function postDay(env, chat, i) {
     options: d.options.map(text => ({ text })),
     type: 'quiz',
     correct_option_id: d.correct,
-    explanation: `${d.explanation} Следующая сцена — ${nextPostWord(D, today)} в ${D.time || '17:00'}.`.slice(0, 200),
+    explanation: `${d.explanation} Следующая сцена выйдет ${nextPost(D, today)}.`.slice(0, 200),
     is_anonymous: true,
   });
   return poll.ok ? 'ok' : 'Опрос не отправлен: ' + poll.description;
