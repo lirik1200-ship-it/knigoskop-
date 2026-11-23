@@ -58,6 +58,8 @@
 .gate-card .msg.wait{color:var(--body);}
 .gate-card .msg{margin:0;}
 .gate-card .seal-btn{align-self:stretch;}
+.gate-card .gate-alt{background:transparent;color:var(--ink);}
+.gate-card .gate-alt:hover{background:var(--ink);color:var(--canvas);}
 .gate-card .note a{color:var(--link);}
 .gate-card .byline{margin-top:var(--s-lg);}
 </style>
@@ -857,7 +859,7 @@ body.present #resTiles,body.present .legend,body.present .rrow .p{display:none!i
       <div id="tsList"></div>
     </section>
     <section class="hub-tab" data-tab="class" hidden>
-      <p class="note">Ученик, открывший ссылку, играет именно в отмеченное. Доступ по подписке на канал нужен по-прежнему: после входа набор сохранится.</p>
+      <p class="note">Ученик, открывший ссылку, играет именно в отмеченное, без подписки и без ограничений.</p>
       <div class="fld"><label for="tsLink">Ссылка для учеников</label><input class="txt-in" id="tsLink" readonly></div>
       <p class="msg" id="tsMsg"></p>
       <div class="prow"><button class="pbtn" id="tsCopy" type="button">Скопировать ссылку</button><button class="pbtn ghost" id="tsPlay" type="button">Показать как у учеников</button></div>
@@ -952,15 +954,17 @@ body.present #resTiles,body.present .legend,body.present .rrow .p{display:none!i
     <div class="gate-card">
       <img src="img/emblem.png" alt="">
       <h1>Книгоскопъ</h1>
-      <p class="sub">тестовая версия · для подписчиков</p>
-      <p class="gate-lead">Игра открыта для подписчиков Telegram-канала <b>@egeminkin</b>. Нажмите кнопку — бот проверит подписку и пришлёт ссылку для входа.</p>
-      <a class="seal-btn gate-go" id="gateGo" href="#" target="_blank" rel="noopener">Получить доступ в Telegram</a>
+      <p class="sub">две сцены в день бесплатно</p>
+      <p class="gate-lead">Сегодня две бесплатные сцены уже сыграны. Чтобы открыть все сцены и режимы без ограничений, подпишитесь на канал <b>@egeminkin</b> в Telegram или вступите в сообщество ВКонтакте. Бот проверит подписку и пришлёт ссылку для входа.</p>
+      <a class="seal-btn gate-go" id="gateGo" href="#" target="_blank" rel="noopener">Войти через Telegram</a>
+      <a class="seal-btn gate-go gate-alt" id="gateVk" href="#" target="_blank" rel="noopener">Войти через ВКонтакте</a>
       <button class="gate-codelink" id="codeToggle" type="button">Вход по коду для коллег</button>
       <form class="gate-code" id="codeForm" hidden autocomplete="off">
         <input class="txt-in" id="codeInput" placeholder="КОД ДОСТУПА" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Код доступа">
         <button class="ink-btn" type="submit">Войти</button>
       </form>
       <p class="msg" id="gateMsg" role="status"></p>
+      <button class="gate-codelink" id="gateBack" type="button">Вернуться на главную</button>
       <aside class="byline">
         <img class="byline-ph" src="img/author.jpg" alt="Кирилл Минкин">
         <div class="byline-tx"><span class="byline-lab">Автор игры</span><b>Кирилл Минкин</b><small>учитель русского языка и литературы</small></div>
@@ -2475,6 +2479,7 @@ addEventListener('keydown',e=>{if(e.key==='Escape')closeSheets();});
 /* ---------- rounds ---------- */
 function startRound(){
   const R=S.list[S.r]; S.a=blankAnswer();
+  if(!BOOT&&!S.present&&window.KG&&!KG.allow(R.id)) return; // без подписки: 2 сцены в день
   const H=!!R.hero; $('labPlace').textContent=H?'Герой':'Место'; $('chipPlace').dataset.open=H?'sheetHero':'sheetMap'; $('heroInput').value='';
   document.querySelectorAll('.top .rw').forEach(e=>e.textContent=H?'Герой':'Глава');
   $('roundNum').textContent=S.r+1; $('roundTot').textContent=S.list.length; scoreLine();
@@ -3015,13 +3020,28 @@ drawRuler();
 </script>
 
 <script>
-/* --- access gate: only Telegram-channel subscribers (checked by worker/knigoskop-bot.js) --- */
+/* --- доступ: 2 сцены в день бесплатно, дальше по подписке (Telegram-канал или сообщество ВКонтакте, проверяет worker/knigoskop-bot.js).
+   Ссылки учителя (?s=…) и командная игра открыты всегда. --- */
 (function(){
-  const API='https://knigoskop.lirik1200.workers.dev', BOT='knigosop_bot';
-  const KT='knigoskop_tg', KV='knigoskop_tg_ok', FRESH=12*3600e3, GRACE=7*24*3600e3;
+  const API='https://knigoskop.lirik1200.workers.dev', BOT='knigosop_bot', VK='club243636418';
+  const KT='knigoskop_tg', KV='knigoskop_tg_ok', KF='knigoskop_free', FREE=2, FRESH=12*3600e3, GRACE=7*24*3600e3;
   const gate=document.getElementById('gate'), msg=document.getElementById('gateMsg');
   const get=k=>{try{return localStorage.getItem(k)}catch(e){return null}}, set=(k,v)=>{try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch(e){}};
   document.getElementById('gateGo').href='https://t.me/'+BOT+'?start=game';
+  document.getElementById('gateVk').href='https://vk.me/'+VK;
+  let OK=false, NOTE='';           // OK — подписка подтверждена или вход по коду; NOTE — что сказать, когда экран откроется
+  const show=(text,cls)=>{msg.className='msg'+(cls?' '+cls:'');msg.textContent=text||'';};
+  const open=()=>{closeSheets();show(NOTE);gate.hidden=false;gate.scrollTop=0;};
+  document.getElementById('gateBack').onclick=()=>{gate.hidden=true;$('result').hidden=true;$('final').hidden=true;$('intro').hidden=false;showStep('stepMode');};
+  /* бесплатные сцены считаются по дню (московское время) в этом браузере */
+  const today=()=>new Date(Date.now()+3*3600e3).toISOString().slice(0,10);
+  const freeIds=()=>{try{const v=JSON.parse(get(KF)||'null');return v&&v.d===today()&&Array.isArray(v.ids)?v.ids:[];}catch(e){return [];}};
+  window.KG={allow(id){
+    if(OK||LESSON) return true;
+    const ids=freeIds(); if(ids.includes(id)) return true;
+    if(ids.length<FREE){ids.push(id);set(KF,JSON.stringify({d:today(),ids}));return true;}
+    open(); return false;
+  }};
   /* --- вход по коду для близких коллег: в странице лежит только хеш (PBKDF2), сам код не хранится --- */
   const KC='knigoskop_code', CODE_SALT='9eea2a467988481a', CODE_HASH='a8ae23946ae89f4ef3bda0c291a78945091d5d76f27c7cc48dd06fa4ba24a0c6';
   const codeForm=document.getElementById('codeForm'), codeInput=document.getElementById('codeInput');
@@ -3035,24 +3055,24 @@ drawRuler();
     try{
       const enc=new TextEncoder(), key=await crypto.subtle.importKey('raw',enc.encode(c),'PBKDF2',false,['deriveBits']);
       const bits=await crypto.subtle.deriveBits({name:'PBKDF2',hash:'SHA-256',salt:enc.encode(CODE_SALT),iterations:150000},key,256);
-      if(hex(bits)===CODE_HASH){set(KC,CODE_HASH);gate.hidden=true;return;}
+      if(hex(bits)===CODE_HASH){set(KC,CODE_HASH);OK=true;gate.hidden=true;show();return;}
     }catch(err){}
     codeInput.select(); show('Код не подходит. Проверьте и попробуйте ещё раз.');
   };
-  if(get(KC)===CODE_HASH){gate.hidden=true;return;}
+  if(get(KC)===CODE_HASH){OK=true;return;}
+  /* --- ссылка от бота: #access=<id>.<срок>.<подпись>, id с буквой v — ВКонтакте --- */
   const m=location.hash.match(/access=([\w.-]+)/);
   if(m){set(KT,m[1]);set(KV,null);history.replaceState(null,'',location.pathname+location.search);}
   const t=get(KT), last=+get(KV)||0;
-  const show=(text,cls)=>{gate.hidden=false;msg.className='msg'+(cls?' '+cls:'');msg.textContent=text||'';};
-  if(!t){show();return;}
+  if(!t) return;
+  OK=!last||Date.now()-last<GRACE;   // пока идёт проверка, не мешаем играть
   if(Date.now()-last<FRESH) return;
-  show('Проверяю подписку…','wait');
   fetch(API+'/verify?t='+encodeURIComponent(t)).then(r=>r.json()).then(d=>{
-    if(d.ok){set(KV,String(Date.now()));gate.hidden=true;return;}
-    if(d.reason==='error'){ if(Date.now()-last<GRACE){gate.hidden=true;return;} show('Не получилось проверить подписку. Попробуйте позже.');return;}
-    set(KT,null);set(KV,null);
-    show(d.reason==='unsubscribed'?'Подписка на канал не найдена. Подпишитесь и получите новую ссылку у бота.':'Ссылка устарела. Получите новую у бота.');
-  }).catch(()=>{ if(Date.now()-last<GRACE){gate.hidden=true;return;} show('Нет связи с сервером. Проверьте интернет и обновите страницу.');});
+    if(d.ok){set(KV,String(Date.now()));OK=true;return;}
+    if(d.reason==='error') return;
+    set(KT,null);set(KV,null);OK=false;
+    NOTE=d.reason==='unsubscribed'?'Подписка не найдена. Подпишитесь снова и получите новую ссылку у бота.':'Ссылка устарела. Получите новую у бота.';
+  }).catch(()=>{});
 })();
 </script>
 <div id="printSheet"></div>
