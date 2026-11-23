@@ -8,6 +8,10 @@
 //   GAME_URL  — переменная, например https://lirik1200-ship-it.github.io/knigoskop-/
 //   DAY_ON    — переменная, 1 = публиковать «Сцену дня» (Cron `0 11,14 * * *` = 14:00 и 17:00 МСК; дни и время берутся из day.json)
 //   IG_ON, IG_USER_ID, IG_TOKEN — публикация роликов в Instagram (см. блок «Instagram» ниже); команда /ig [n] — пробная публикация
+//   VK_GROUP  — переменная, id сообщества ВКонтакте (число без минуса), например 243636418
+//   VK_TOKEN  — секрет, ключ доступа сообщества (права: сообщения сообщества, управление сообществом)
+//   VK_CONFIRM — переменная, строка подтверждения из «Работа с API → Callback API»
+//   VK_SECRET — переменная, «Секретный ключ» из настроек Callback API (необязательно, но лучше задать)
 //   DB        — привязка D1 (Bindings → D1 database): анонимная статистика игры. Без неё статистика просто не пишется
 // Бот должен быть администратором канала, иначе Telegram не покажет ему подписчиков.
 
@@ -21,6 +25,7 @@ export default {
     const url = new URL(req.url);
     try {
       if (url.pathname === '/tg' && req.method === 'POST') return await onUpdate(req, env, ctx);
+      if (url.pathname === '/vk' && req.method === 'POST') return await onVK(req, env, ctx);
       if (url.pathname === '/verify') return await onVerify(url, env);
       if (url.pathname === '/setup') return await onSetup(url, env);
       if (url.pathname === '/hit' && req.method === 'POST') return await onHit(req, env);
@@ -105,13 +110,13 @@ async function onUpdate(req, env, ctx) {
     const token = await makeToken(env, from.id);
     await api(env, 'sendMessage', {
       chat_id: chat,
-      text: 'Подписка подтверждена. Спасибо!\n\nНажмите кнопку, чтобы открыть «Книгоскопъ». Ссылка личная, работает 30 дней.',
+      text: 'Подписка подтверждена. Спасибо!\n\nНажмите кнопку, чтобы открыть «Книгоскопъ» без ограничений. Ссылка личная, работает 30 дней.',
       reply_markup: { inline_keyboard: [[{ text: 'Открыть игру', url: env.GAME_URL + '#access=' + token }]] },
     });
   } else if (st === 'none') {
     await api(env, 'sendMessage', {
       chat_id: chat,
-      text: 'Игра «Книгоскопъ» открыта для подписчиков канала ' + env.CHANNEL + '.\n\nПодпишитесь и нажмите «Я подписался».',
+      text: 'Все сцены «Книгоскопа» открыты для подписчиков канала ' + env.CHANNEL + '. Без подписки можно сыграть две сцены в день.\n\nПодпишитесь и нажмите «Я подписался».',
       reply_markup: { inline_keyboard: [
         [{ text: 'Подписаться на канал', url: channelLink(env) }],
         [{ text: 'Я подписался', callback_data: 'check' }],
@@ -126,6 +131,49 @@ async function onUpdate(req, env, ctx) {
 async function isChannelAdmin(env, uid) {
   const r = await api(env, 'getChatMember', { chat_id: env.CHANNEL, user_id: uid });
   return r.ok && (r.result.status === 'creator' || r.result.status === 'administrator');
+}
+
+/* ---------- ВКонтакте: бот в сообщениях сообщества (Callback API) ----------
+   Ученик пишет сообществу → бот проверяет, вступил ли он, и присылает ту же ссылку доступа, что и в Telegram,
+   только id с буквой v: v12345.<срок>.<подпись>. Игра проверяет её через /verify, как и телеграмную. */
+async function vk(env, method, params) {
+  const body = new URLSearchParams({ ...params, access_token: env.VK_TOKEN, v: '5.199' });
+  const r = await fetch('https://api.vk.com/method/' + method, { method: 'POST', body });
+  return r.json();
+}
+async function vkMember(env, uid) {
+  if (!env.VK_TOKEN || !env.VK_GROUP) return 'error';
+  const r = await vk(env, 'groups.isMember', { group_id: env.VK_GROUP, user_id: uid });
+  if (r.error) return 'error';
+  return r.response === 1 || (r.response && r.response.member === 1) ? 'member' : 'none';
+}
+const vkGroupLink = env => 'https://vk.ru/club' + env.VK_GROUP;
+async function vkSend(env, peer, message, link) {
+  const p = { peer_id: peer, random_id: String(Math.floor(Math.random() * 2e9)), message };
+  if (link) p.keyboard = JSON.stringify({ inline: true, buttons: [[{ action: { type: 'open_link', link: link.url, label: link.label } }]] });
+  return vk(env, 'messages.send', p);
+}
+async function onVK(req, env, ctx) {
+  const u = await req.json().catch(() => ({}));
+  if (String(u.group_id) !== String(env.VK_GROUP)) return new Response('ok');
+  if (u.type === 'confirmation') return new Response(String(env.VK_CONFIRM || ''));
+  if (env.VK_SECRET && u.secret !== env.VK_SECRET) return new Response('ok');
+  const uid = u.type === 'message_new' ? u.object && u.object.message && u.object.message.from_id
+    : u.type === 'group_join' ? u.object && u.object.user_id : null;
+  if (uid > 0) ctx.waitUntil(vkReply(env, uid, u.type === 'group_join'));
+  return new Response('ok'); // ВКонтакте ждёт «ok», иначе будет присылать событие снова
+}
+async function vkReply(env, uid, joined) {
+  const st = await vkMember(env, uid);
+  if (st === 'member') {
+    const token = await makeToken(env, 'v' + uid);
+    return vkSend(env, uid, (joined ? 'Спасибо, что вступили в сообщество!' : 'Подписка подтверждена. Спасибо!') +
+      '\n\nНажмите кнопку, чтобы открыть «Книгоскопъ» без ограничений. Ссылка личная, работает 30 дней.',
+      { url: env.GAME_URL + '#access=' + token, label: 'Открыть игру' });
+  }
+  if (st === 'none') return vkSend(env, uid, 'Все сцены «Книгоскопа» открыты для участников этого сообщества.\n\n' +
+    'Вступите в сообщество по ссылке ' + vkGroupLink(env) + ', затем напишите сюда любое сообщение, и бот пришлёт ссылку на игру.');
+  return vkSend(env, uid, 'Не получилось проверить подписку. Напишите ещё раз через минуту.');
 }
 
 /* ---------- сцена дня: расписание и вопросы лежат в day.json рядом с игрой ---------- */
@@ -329,7 +377,7 @@ async function onVerify(url, env) {
   const cors = { 'access-control-allow-origin': new URL(env.GAME_URL).origin, 'content-type': 'application/json' };
   const uid = await readToken(env, url.searchParams.get('t') || '');
   if (!uid) return new Response(JSON.stringify({ ok: false, reason: 'invalid' }), { headers: cors });
-  const st = await memberStatus(env, uid);
+  const st = String(uid)[0] === 'v' ? await vkMember(env, String(uid).slice(1)) : await memberStatus(env, uid);
   if (st === 'error') return new Response(JSON.stringify({ ok: false, reason: 'error' }), { headers: cors });
   return new Response(JSON.stringify({ ok: st === 'member', reason: st === 'member' ? '' : 'unsubscribed' }), { headers: cors });
 }
@@ -371,8 +419,8 @@ async function makeToken(env, uid) {
 
 async function readToken(env, t) {
   const [uid, exp, sig] = t.split('.');
-  if (!uid || !exp || !sig || !/^\d+$/.test(uid) || !/^\d+$/.test(exp)) return null;
+  if (!uid || !exp || !sig || !/^v?\d+$/.test(uid) || !/^\d+$/.test(exp)) return null;
   if (+exp < Date.now() / 1000) return null;
   if ((await hmac(env, uid + '.' + exp)) !== sig) return null;
-  return +uid;
+  return uid[0] === 'v' ? uid : +uid; // v12345 — ВКонтакте, число — Telegram
 }
