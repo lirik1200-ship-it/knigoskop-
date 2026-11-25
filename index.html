@@ -3053,7 +3053,7 @@ addEventListener('keydown',e=>{
 
 /* --- анонимная статистика: только события игры, без имён, адресов и меток пользователя --- */
 const API_BASE='https://knigoskop.lirik1200.workers.dev';
-const TRACK=/github\.io$/.test(location.hostname);
+const TRACK=/(github\.io|knigo-skop\.ru)$/.test(location.hostname);
 function track(ev,k,v){ try{ if(!TRACK) return; navigator.sendBeacon(API_BASE+'/hit',JSON.stringify(Object.assign({ev,k},v||{}))); }catch(e){} }
 track('open',matchMedia('(display-mode: standalone)').matches?'app':DAYNO?'day':LESSON?'set':'direct');
 
