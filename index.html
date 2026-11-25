@@ -607,6 +607,55 @@ body.present .report{display:none!important;}
 .step-sub,.mode-card .d,.byline-tx small,.whatsnew,.note,.rules ol,.score-line,.gate-lead{font-family:var(--text)!important;font-style:normal!important;font-weight:500;}
 .mode-card .d{opacity:1;}
 .rules ol b{font-weight:600;}
+/* ---------- главная: шире на компьютере, карточки рядом, «как это работает», сцена дня, учителям ---------- */
+.cover:has(> #stepMode:not([hidden])){max-width:980px;}
+.mode-grid{display:grid;gap:var(--s-lg);}
+.wn-list{margin:4px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:4px;}
+.wn-list strong{font-weight:600;color:var(--ink);}
+.free-bar{display:flex;align-items:center;justify-content:space-between;gap:var(--s-md);flex-wrap:wrap;padding:12px 14px;border:1px solid var(--ink);font-family:var(--text);font-weight:500;font-size:15px;line-height:1.35;color:var(--ink);}
+.free-bar b{font-weight:700;}
+.free-go{padding:9px 14px;background:var(--ink);color:var(--canvas);font-family:var(--ui);font-weight:700;font-size:13px;}
+.how{display:flex;flex-direction:column;gap:var(--s-md);padding-top:var(--s-md);border-top:1px solid var(--ink);}
+.cover .how-steps{list-style:none;margin:0;padding:0;display:grid;gap:var(--s-md);}
+.cover .how-steps li{display:grid;grid-template-columns:44px 1fr;column-gap:var(--s-sm);row-gap:0;padding:0;border:0;counter-increment:none;}
+.cover .how-steps li::before{content:none;}
+.how-steps .hn{grid-row:span 2;font-family:var(--display);font-size:34px;line-height:1;color:var(--sealwax);}
+.cover .how-steps b{font-family:var(--display);font-weight:400;font-size:24px;line-height:1.1;color:var(--ink);}
+.how-steps li>span:last-child{margin-top:4px;font-family:var(--text);font-weight:500;font-size:15px;line-height:1.4;color:var(--body);}
+.how-btns{display:flex;flex-wrap:wrap;gap:var(--s-sm);}
+.how-btns .ink-btn{flex:1 1 220px;}
+.home-pair{display:grid;gap:var(--s-lg);}
+.day-card,.teach-card{border:1px solid var(--ink);display:flex;flex-direction:column;}
+.day-img{display:block;aspect-ratio:16/9;background:#111;overflow:hidden;}
+.day-img img{width:100%;height:100%;object-fit:cover;display:block;}
+.day-tx,.teach-card{gap:8px;}
+.day-tx{display:flex;flex-direction:column;gap:8px;padding:var(--s-md) var(--s-lg) var(--s-lg);}
+.teach-card{padding:var(--s-md) var(--s-lg) var(--s-lg);}
+.day-card h3,.teach-card h3{margin:0;font-family:var(--display);font-weight:400;font-size:26px;line-height:1.1;color:var(--ink);}
+.day-note{margin:0;font-family:var(--text);font-weight:500;font-size:15px;line-height:1.4;color:var(--body);}
+.day-go{align-self:flex-start;min-width:0;padding:12px 22px;font-size:15px;text-decoration:none;}
+.day-card.soon .day-img{display:none;}
+.teach-list{margin:2px 0 6px;padding-left:18px;font-family:var(--text);font-weight:500;font-size:15px;line-height:1.5;color:var(--body);}
+.teach-card .ink-btn{align-self:flex-start;}
+.vid-wrap{display:flex;justify-content:center;background:#0c0b0a;}
+.vid-wrap video{display:block;max-width:100%;max-height:72vh;}
+@media (min-width:760px){
+  .mode-grid{grid-template-columns:1fr 1fr;}
+  .mode-grid .mode-card{height:300px;}
+  .cover .how-steps{grid-template-columns:repeat(3,1fr);gap:var(--s-xl);}
+  .home-pair{grid-template-columns:1fr 1fr;align-items:start;}
+  .promo-links .ink-btn{flex:1 1 0;}
+}
+/* ---------- кабинет учителя: шаги и переходы ---------- */
+.ts-steps{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:6px;font-family:var(--text);font-weight:500;font-size:15px;line-height:1.45;color:var(--body);}
+.ts-steps b{color:var(--ink);font-weight:600;}
+.ts-next{position:sticky;bottom:0;z-index:2;display:flex;flex-direction:column;gap:8px;margin-top:var(--s-md);padding:12px 0 calc(12px + env(safe-area-inset-bottom,0px));background:var(--canvas);border-top:2px solid var(--ink);font-family:var(--text);font-weight:600;font-size:15px;color:var(--ink);}
+.ts-next-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.ts-next-btns button{padding:11px 6px;background:var(--ink);color:var(--canvas);font-family:var(--ui);font-weight:700;font-size:13px;}
+.ts-next.empty .ts-next-btns button{background:var(--canvas-soft);color:var(--body);}
+.panel .hub-tabs{padding-right:48px;}
+.ts-chip{display:flex;align-items:center;justify-content:space-between;gap:var(--s-sm);padding:10px 12px;background:var(--canvas-soft);border:1px solid var(--hairline);font-family:var(--text);font-weight:500;font-size:14px;color:var(--ink);}
+.ts-chip button{font-family:var(--ui);font-weight:700;font-size:12px;text-decoration:underline;text-underline-offset:3px;}
 /* командная игра на слайде */
 .pbar{position:absolute;left:0;right:0;bottom:0;z-index:5;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;padding:12px 18px calc(12px + env(safe-area-inset-bottom,0px));background:rgba(10,10,10,.93);color:#fff;border-top:1px solid #333;}
 .pteam{display:flex;align-items:center;gap:12px;min-width:0;}
@@ -787,11 +836,42 @@ body.present #resTiles,body.present .legend,body.present .rrow .p{display:none!i
       <section class="step" id="stepMode">
         <div class="brand"><img src="img/emblem.png" alt=""><div><h1>Книгоскопъ</h1></div></div>
         <p class="sub">сцены и герои русской литературы</p>
-        <div class="whatsnew" id="whatsNew" hidden><b>Что нового</b>30 новых сцен: от «Царевны-лягушки» до «Тихого Дона», теперь их 72, все панорамы новых сцен в высоком качестве. На шкале направлений появился классицизм.<button id="whatsNewClose" type="button" aria-label="Скрыть">×</button></div>
+        <div class="whatsnew" id="whatsNew" hidden><b>Что нового</b><ul class="wn-list">
+          <li><strong>20 новых героев, всего 39:</strong> от Митрофанушки и Садко до Печорина и Воланда. Новые авторы: Фонвизин и Грин.</li>
+          <li><strong>Меню ☰ на всех экранах:</strong> главная, новая партия, библиотека, кабинет учителя.</li>
+          <li><strong>Игру можно поставить на телефон</strong> иконкой, как приложение.</li>
+          <li><strong>«Сцена дня»</strong> в Telegram: понедельник и среда в 17:00, суббота в 14:00.</li>
+          <li><strong>Нашли ошибку в сцене?</strong> Под ответом есть кнопка «Сообщить автору».</li>
+        </ul><button id="whatsNewClose" type="button" aria-label="Скрыть">×</button></div>
+        <div class="free-bar" id="freeBar" hidden><span id="freeTxt"></span><button class="free-go" id="freeGo" type="button">Полный доступ</button></div>
         <p class="kicker">Выберите игру</p>
         <h2 class="step-h">Что будем узнавать?</h2>
+        <div class="mode-grid">
         <button class="mode-card" data-mode="scene" type="button"><img src="img/s_strannik.webp" alt=""><span class="tag" id="mcScene">42 сцены</span><span class="num">I</span><span class="in"><span class="t">Угадай сцену</span><span class="d">Войдите в панораму, найдите детали из текста, назовите книгу.</span></span></button>
         <button class="mode-card" data-mode="hero" type="button"><img src="img/s_h_chatsky.webp" alt=""><span class="tag new" id="mcHero">Новое · 5 героев</span><span class="num">II</span><span class="in"><span class="t">Угадай героя</span><span class="d">Вещи на столе выдадут хозяина.</span></span></button>
+        </div>
+        <section class="how" aria-labelledby="howH">
+          <p class="kicker" id="howH">Как это работает</p>
+          <ol class="how-steps">
+            <li><span class="hn">I</span><b>Осмотритесь</b><span>Поворачивайте панораму пальцем или мышью и ищите детали из текста: они спрятаны и не подсвечены.</span></li>
+            <li><span class="hn">II</span><b>Ответьте</b><span>Отметьте направление на шкале, место на карте, выберите автора по портрету и впишите название.</span></li>
+            <li><span class="hn">III</span><b>Узнайте больше</b><span>Получите очки, прочитайте цитату и разбор сцены, ответьте на вопрос в духе ЕГЭ.</span></li>
+          </ol>
+          <div class="how-btns"><button class="ink-btn" type="button" data-video="how-play">▶ Видео: как играть</button><button class="ink-btn" type="button" data-video="how-install">▶ Как поставить на телефон</button></div>
+        </section>
+        <div class="home-pair">
+          <section class="day-card" id="dayCard" hidden>
+            <a class="day-img" id="dayImgLink" href="#"><img id="dayImg" alt="" loading="lazy"></a>
+            <div class="day-tx"><p class="kicker" id="dayKick">Сцена дня</p><h3 id="dayH">Из какого произведения эта сцена?</h3>
+              <p class="day-note" id="dayNote"></p>
+              <a class="seal-btn day-go" id="dayGo" href="#">Играть сцену дня</a></div>
+          </section>
+          <section class="teach-card">
+            <p class="kicker">Учителям</p><h3>Урок по сценам за пять минут</h3>
+            <ul class="teach-list"><li>соберите набор сцен или героев по классам</li><li>отправьте классу ссылку: ученики играют без ограничений</li><li>сыграйте командами на проекторе</li><li>распечатайте лист для урока без телефонов</li></ul>
+            <button class="ink-btn" id="teachGo" type="button">Открыть кабинет учителя</button>
+          </section>
+        </div>
         <aside class="byline">
           <img class="byline-ph" src="img/author.jpg" alt="Кирилл Минкин">
           <div class="byline-tx"><span class="byline-lab">Автор игры</span><b>Кирилл Минкин</b><small>учитель русского языка и литературы</small></div>
@@ -856,14 +936,17 @@ body.present #resTiles,body.present .legend,body.present .rrow .p{display:none!i
   <div class="screen panel" id="tsPanel" hidden><article class="page">
     <button class="back-link" data-closep type="button">← Назад</button>
     <h2>Кабинет учителя</h2>
+    <ol class="ts-steps"><li><b>Соберите набор.</b> Отметьте сцены или героев на вкладке «Набор».</li><li><b>Выберите, как провести урок:</b> ссылка классу, игра командами на слайде или печатный лист.</li></ol>
     <div class="hub-tabs" id="hubTabs"><button class="on" data-tab="set" type="button">Набор</button><button data-tab="class" type="button">Классу</button><button data-tab="slide" type="button">На слайде</button><button data-tab="print" type="button">Лист</button></div>
     <section class="hub-tab" data-tab="set">
       <p class="note">Отметьте, что должно выпасть ученикам. Набор сохраняется в этом браузере и нужен для ссылки и для игры на слайде.</p>
       <div class="seg" id="tsMode"><button data-m="scene" type="button">Сцены<small id="tsMcScene"></small></button><button data-m="hero" type="button">Герои<small id="tsMcHero"></small></button></div>
       <div class="ts-bar"><span id="tsCount">Выбрано: 0</span><button class="grade-all" id="tsReset" type="button">Сбросить</button></div>
       <div id="tsList"></div>
+      <div class="ts-next" id="tsNext"><span id="tsNextTxt">Отметьте хотя бы одну позицию</span><div class="ts-next-btns"><button type="button" data-goto="class">Ссылка классу</button><button type="button" data-goto="slide">На слайде</button><button type="button" data-goto="print">Лист</button></div></div>
     </section>
     <section class="hub-tab" data-tab="class" hidden>
+      <div class="ts-chip"><span data-tschip></span><button type="button" data-goto="set">Изменить набор</button></div>
       <p class="note">Ученик, открывший ссылку, играет именно в отмеченное, без подписки и без ограничений.</p>
       <div class="fld"><label for="tsLink">Ссылка для учеников</label><input class="txt-in" id="tsLink" readonly></div>
       <p class="msg" id="tsMsg"></p>
@@ -873,6 +956,7 @@ body.present #resTiles,body.present .legend,body.present .rrow .p{display:none!i
       <div class="prow"><button class="pbtn ghost" id="btnTeacher" type="button" hidden>Открыть уроки</button></div>
     </section>
     <section class="hub-tab" data-tab="slide" hidden>
+      <div class="ts-chip"><span data-tschip></span><button type="button" data-goto="set">Изменить набор</button></div>
       <p class="note">Игра для всего класса на проекторе: две команды отвечают по очереди вслух, очки начисляете вы. Если в наборе ничего не отмечено, выпадут шесть случайных вопросов выбранного режима.</p>
       <div class="team-names"><input id="slideA" value="Команда 1" maxlength="24" aria-label="Первая команда"><input id="slideB" value="Команда 2" maxlength="24" aria-label="Вторая команда"></div>
       <p class="note" id="slideSum"></p>
@@ -886,6 +970,7 @@ body.present #resTiles,body.present .legend,body.present .rrow .p{display:none!i
       </ul>
     </section>
     <section class="hub-tab" data-tab="print" hidden>
+      <div class="ts-chip"><span data-tschip></span><button type="button" data-goto="set">Изменить набор</button></div>
       <p class="note">Лист для урока без телефонов: кадр каждой позиции из набора и поля для ответов. В окне печати выберите «Сохранить как PDF» или сразу отправьте лист на принтер.</p>
       <div class="fld"><label for="prTitle">Заголовок листа</label><input class="txt-in" id="prTitle" maxlength="70" autocomplete="off" placeholder="10 «Б», проверочная по Гончарову"></div>
       <div class="fld"><label>Сколько на странице</label></div>
@@ -946,6 +1031,14 @@ body.present #resTiles,body.present .legend,body.present .rrow .p{display:none!i
     <a href="https://t.me/egeminkin" target="_blank" rel="noopener">Личный канал автора<small>Telegram ↗</small></a>
     <a href="https://vk.ru/club243636418" target="_blank" rel="noopener">Группа<small>ВКонтакте ↗</small></a>
   </nav>
+
+  <div class="screen panel" id="videoPanel" hidden><article class="page">
+    <button class="back-link" data-closep type="button">← Назад</button>
+    <h2 id="videoH">Как играть</h2>
+    <div class="vid-wrap"><video id="vidEl" controls playsinline muted preload="none"></video></div>
+    <p class="note" id="videoNote"></p>
+    <div class="prow"><button class="pbtn" data-closep type="button">Понятно</button></div>
+  </article></div>
 
   <div class="screen panel" id="installPanel" hidden><article class="page">
     <h2>Книгоскопъ на телефоне</h2>
@@ -2645,7 +2738,7 @@ function tsSel(){return [...new Set([...document.querySelectorAll('#tsList input
 function tsWord(n){return TSMODE==='hero'?heroWord(n):sceneWord(n);}
 function tsUpdate(){const ids=tsSel(); $('tsCount').textContent='Выбрано: '+ids.length+' '+tsWord(ids.length); $('tsLink').value=ids.length?location.href.split(/[?#]/)[0]+'?s='+ids.join(','):''; $('tsMsg').textContent='';
   $('slideSum').textContent=ids.length?'На слайде будет: '+ids.length+' '+tsWord(ids.length)+' из набора.':'Набор пуст — выпадут шесть случайных вопросов режима «'+(TSMODE==='hero'?'Угадай героя':'Угадай сцену')+'».';
-  try{localStorage.setItem(tsKey(),JSON.stringify(ids));}catch(e){}}
+  try{localStorage.setItem(tsKey(),JSON.stringify(ids));}catch(e){} tsNav(ids);}
 function buildTsList(){
   let saved=[]; try{saved=JSON.parse(localStorage.getItem(tsKey())||'[]');}catch(e){}
   document.querySelectorAll('#tsMode button').forEach(b=>b.classList.toggle('on',b.dataset.m===TSMODE));
@@ -2885,7 +2978,7 @@ $('btnLesson').onclick=openLessonJoin;
 $('btnJoin').onclick=joinLesson;
 $('btnTeacher').onclick=openTeacher;
 /* --- стартовые шаги: режим → кто вы → настройка --- */
-function showStep(id){['stepMode','stepWho','stepPlay'].forEach(x=>$(x).hidden=x!==id);$('intro').scrollTop=0;}
+function showStep(id){['stepMode','stepWho','stepPlay'].forEach(x=>$(x).hidden=x!==id);$('intro').scrollTop=0;if(id==='stepMode')homeRefresh();}
 function applyModeTexts(){const H=MODE==='hero', t=H?'Угадай героя':'Угадай сцену';
   $('whoKick').textContent=t; $('playKick').textContent=t; $('countLab').textContent=H?'Сколько героев?':'Сколько сцен?';
   $('rulesScene').hidden=H; $('rulesHero').hidden=!H;
@@ -2903,7 +2996,7 @@ $('codeGo').onclick=()=>{const c=$('codeLesson').value.trim().toUpperCase().repl
 $('codeLesson').addEventListener('keydown',e=>{if(e.key==='Enter')$('codeGo').click();});
 $('mcScene').textContent=POOL.length+' '+sceneWord(POOL.length);
 $('mcHero').textContent='Новое · '+HPOOL.length+' '+heroWord(HPOOL.length);
-(function(){const KN='knigoskop_news',V='2026-11-02';let seen=null;try{seen=localStorage.getItem(KN);}catch(e){}
+(function(){const KN='knigoskop_news',V='2026-11-24';let seen=null;try{seen=localStorage.getItem(KN);}catch(e){}
   if(seen!==V)$('whatsNew').hidden=false;
   $('whatsNewClose').onclick=()=>{$('whatsNew').hidden=true;try{localStorage.setItem(KN,V);}catch(e){}};})();
 applyModeTexts(); renderGrades(); renderCount();
@@ -3016,6 +3109,52 @@ addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); INSTALL=e; });
 addEventListener('appinstalled',()=>{ INSTALL=null; $('menuInstall').hidden=true; track('install','app'); });
 if('serviceWorker' in navigator && /^https:$/.test(location.protocol)) addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 
+
+/* --- кабинет учителя: подсказка «что дальше» и быстрый переход между вкладками --- */
+function tsNav(ids){ const n=ids.length, w=n?n+' '+tsWord(n):'';
+  $('tsNextTxt').textContent=n?'В наборе: '+w+'. Как провести урок?':'Отметьте хотя бы одну позицию, затем выберите, как провести урок';
+  $('tsNext').classList.toggle('empty',!n);
+  document.querySelectorAll('[data-tschip]').forEach(e=>e.textContent=n?'В наборе: '+w:'Набор пуст: на слайде выпадут шесть случайных вопросов, ссылка и лист не соберутся'); }
+document.querySelectorAll('#tsPanel [data-goto]').forEach(b=>b.onclick=()=>{ hubTab(b.dataset.goto); $('tsPanel').scrollTop=0; if(b.dataset.goto==='print') prSum(); });
+
+/* --- главная: счётчик бесплатных сцен, сцена дня, видео, кабинет учителя --- */
+function homeRefresh(){
+  const k=window.KG&&KG.info?KG.info():null, bar=$('freeBar');
+  if(!k||k.ok){ bar.hidden=true; return; }
+  const left=Math.max(0,k.free-k.used); bar.hidden=false;
+  $('freeTxt').innerHTML=left?'Сегодня бесплатно: <b>'+left+' '+(left===1?'сцена':'сцены')+'</b> из '+k.free+'. Без ограничений: через бота в Telegram или ВКонтакте.':'Бесплатные сцены на сегодня сыграны. Откройте полный доступ через бота в Telegram или ВКонтакте.';
+}
+$('freeGo').onclick=()=>{ if(window.KG&&KG.gate) KG.gate(); };
+addEventListener('kgchange',homeRefresh);
+$('teachGo').onclick=()=>openTeacherSet(MODE);
+const VIDEOS={'how-play':{h:'Как играть',src:'img/video/how-play.mp4',poster:'img/video/how-play.jpg',note:'Сцена из романа «Война и мир»: осмотр панорамы, скрытая деталь, направление, место, автор и название.'},
+  'how-install':{h:'Как поставить на телефон',src:'img/video/how-install.mp4',poster:'img/video/how-install.jpg',note:'Меню ☰ → «Установить на телефон». На iPhone: Safari → «Поделиться» → «На экран „Домой“». На Android: Chrome → ⋮ → «Установить приложение».'}};
+document.querySelectorAll('[data-video]').forEach(b=>b.onclick=()=>{ const v=VIDEOS[b.dataset.video], el=$('vidEl');
+  $('videoH').textContent=v.h; $('videoNote').textContent=v.note; el.poster=v.poster; el.src=v.src;
+  $('videoPanel').hidden=false; $('videoPanel').scrollTop=0; el.play().catch(()=>{}); });
+$('videoPanel').querySelectorAll('[data-closep]').forEach(b=>b.addEventListener('click',()=>{ const el=$('vidEl'); el.pause(); }));
+// сцена дня: та, что последней вышла в канале по расписанию day.json (время московское)
+(function(){ const WD=['в воскресенье','в понедельник','во вторник','в среду','в четверг','в пятницу','в субботу'];
+  fetch('day.json').then(r=>r.json()).then(D=>{
+    const sch=D.schedule||{}, MSK=3*3600e3, now=Date.now(), day0=Math.floor((Date.parse(D.start)+0)/864e5);
+    const at=(d,t)=>d*864e5+(parseInt(t)*60+(+t.split(':')[1]||0))*60e3-MSK;   // момент публикации в UTC
+    let idx=-1, next=null;
+    for(let d=day0; d<=day0+400; d++){ const t=sch[(d+4)%7]; if(!t) continue; const T=at(d,t);
+      if(T<=now) idx++; else { next={d,t}; break; } }
+    const nextTxt=next?(WD[(next.d+4)%7]+' в '+next.t):'';
+    $('dayCard').hidden=false;
+    if(idx<0){ const x=D.days[0];
+      $('dayCard').classList.add('soon');
+      $('dayKick').textContent='Сцена дня'; $('dayH').textContent='Скоро первая сцена дня';
+      $('dayNote').textContent='В Telegram-канале @egeminkin: '+(nextTxt?'первая выйдет '+nextTxt+'. ':'')+'Угадайте произведение в викторине, а детали ищите в игре.';
+      $('dayGo').textContent='Канал @egeminkin'; $('dayGo').href='https://t.me/egeminkin'; $('dayGo').target='_blank'; return; }
+    const x=D.days[idx%D.days.length], url='?s='+x.id+'&day='+(idx+1);
+    $('dayImg').src='img/s_'+x.id+'.webp'; $('dayImgLink').href=url; $('dayGo').href=url;
+    $('dayKick').textContent='Сцена дня № '+(idx+1);
+    $('dayNote').textContent='Из Telegram-канала @egeminkin. В игре здесь спрятаны детали из текста.'+(nextTxt?' Следующая сцена выйдет '+nextTxt+'.':'');
+  }).catch(()=>{});
+})();
+
 $('btnCreate').onclick=createLesson;
 $('btnPickAll').onclick=()=>{const b=[...$('scenePick').querySelectorAll('input')],on=b.some(i=>!i.checked);b.forEach(i=>i.checked=on);};
 document.querySelectorAll('[data-closep]').forEach(b=>b.onclick=()=>{b.closest('.panel').hidden=true;});
@@ -3048,7 +3187,8 @@ drawRuler();
     const ids=freeIds(); if(ids.includes(id)) return true;
     if(ids.length<FREE){ids.push(id);set(KF,JSON.stringify({d:today(),ids}));return true;}
     open(); return false;
-  }};
+  }, info(){ return {ok:OK||!!LESSON, used:freeIds().length, free:FREE}; }, gate(){ open(); }};
+  setTimeout(()=>dispatchEvent(new Event('kgchange')),0);   // главная обновит счётчик, когда станет известно про подписку
   /* --- вход по коду для близких коллег: в странице лежит только хеш (PBKDF2), сам код не хранится --- */
   const KC='knigoskop_code', CODE_SALT='9eea2a467988481a', CODE_HASH='a8ae23946ae89f4ef3bda0c291a78945091d5d76f27c7cc48dd06fa4ba24a0c6';
   const codeForm=document.getElementById('codeForm'), codeInput=document.getElementById('codeInput');
@@ -3062,7 +3202,7 @@ drawRuler();
     try{
       const enc=new TextEncoder(), key=await crypto.subtle.importKey('raw',enc.encode(c),'PBKDF2',false,['deriveBits']);
       const bits=await crypto.subtle.deriveBits({name:'PBKDF2',hash:'SHA-256',salt:enc.encode(CODE_SALT),iterations:150000},key,256);
-      if(hex(bits)===CODE_HASH){set(KC,CODE_HASH);OK=true;gate.hidden=true;show();return;}
+      if(hex(bits)===CODE_HASH){set(KC,CODE_HASH);OK=true;gate.hidden=true;show();dispatchEvent(new Event('kgchange'));return;}
     }catch(err){}
     codeInput.select(); show('Код не подходит. Проверьте и попробуйте ещё раз.');
   };
@@ -3075,9 +3215,9 @@ drawRuler();
   OK=!last||Date.now()-last<GRACE;   // пока идёт проверка, не мешаем играть
   if(Date.now()-last<FRESH) return;
   fetch(API+'/verify?t='+encodeURIComponent(t)).then(r=>r.json()).then(d=>{
-    if(d.ok){set(KV,String(Date.now()));OK=true;return;}
+    if(d.ok){set(KV,String(Date.now()));OK=true;dispatchEvent(new Event('kgchange'));return;}
     if(d.reason==='error') return;
-    set(KT,null);set(KV,null);OK=false;
+    set(KT,null);set(KV,null);OK=false;dispatchEvent(new Event('kgchange'));
     NOTE=d.reason==='unsubscribed'?'Подписка не найдена. Подпишитесь снова и получите новую ссылку у бота.':'Ссылка устарела. Получите новую у бота.';
   }).catch(()=>{});
 })();
