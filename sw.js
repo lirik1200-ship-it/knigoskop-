@@ -1,7 +1,7 @@
 // Книгоскопъ: офлайн-кэш для установленной игры.
 // Страница и day.json — сначала сеть (чтобы обновления приходили сразу), без сети — из кэша.
 // Картинки — из кэша с фоновым обновлением; больших панорам храним не больше 24.
-const V = 'k1', SHELL = 'shell-' + V, IMG = 'img-' + V, PANO = 'pano-' + V, FONT = 'font-' + V;
+const V = 'k2', SHELL = 'shell-' + V, IMG = 'img-' + V, PANO = 'pano-' + V, FONT = 'font-' + V;
 const KEEP = [SHELL, IMG, PANO, FONT];
 
 self.addEventListener('install', e => {
@@ -15,7 +15,7 @@ async function networkFirst(req, key) {
   const c = await caches.open(SHELL);
   try {
     const r = await fetch(req);
-    if (r.ok) c.put(key || req, r.clone());
+    if (r.status === 200) c.put(key || req, r.clone());
     return r;
   } catch (e) {
     return (await c.match(key || req)) || (await c.match('./')) || Response.error();
@@ -24,8 +24,8 @@ async function networkFirst(req, key) {
 async function staleWhileRevalidate(req, name, limit) {
   const c = await caches.open(name), hit = await c.match(req);
   const net = fetch(req).then(async r => {
-    if (r.ok) {
-      await c.put(req, r.clone());
+    if (r.status === 200) {
+      await c.put(req, r.clone()).catch(() => {});
       if (limit) { const ks = await c.keys(); for (let i = 0; i < ks.length - limit; i++) await c.delete(ks[i]); }
     }
     return r;
@@ -35,11 +35,13 @@ async function staleWhileRevalidate(req, name, limit) {
 
 self.addEventListener('fetch', e => {
   const req = e.request; if (req.method !== 'GET') return;
+  if (req.headers.has('range')) return;                              // видео и аудио браузер грузит кусками — мимо кэша
   const u = new URL(req.url);
   if (u.origin === location.origin) {
     if (req.mode === 'navigate') return e.respondWith(networkFirst(req, './'));
     if (u.pathname.endsWith('/day.json')) return e.respondWith(networkFirst(req));
     if (/\/img\/day\//.test(u.pathname)) return;               // ролики для канала игре не нужны
+    if (/\.(mp4|webm|mov)$/i.test(u.pathname)) return;           // видеоинструкции — напрямую с сервера
     if (/\/img\/l_/.test(u.pathname)) return e.respondWith(staleWhileRevalidate(req, PANO, 24));
     if (/\/img\//.test(u.pathname)) return e.respondWith(staleWhileRevalidate(req, IMG));
     return;
