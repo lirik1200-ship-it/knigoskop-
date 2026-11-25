@@ -68,7 +68,7 @@
 <title>Книгоскопъ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;700&family=Golos+Text:wght@500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;700&family=Golos+Text:wght@500;600&display=swap">
 <style>
 /* ============ Книгоскопъ · «Журнальный разворот» — по DESIGN.md (WIRED) ============ */
 :root{
@@ -675,6 +675,110 @@ body.present .rail{bottom:96px;}
 body.present #resTiles,body.present .legend,body.present .rrow .p{display:none!important;}
 .spot.shown{outline:2px dashed #fff;box-shadow:0 0 0 2px rgba(0,0,0,.45),inset 0 0 0 9999px rgba(255,255,255,.1);}
 @media (max-width:760px){.pbar{grid-template-columns:1fr 1fr;gap:10px;}.pmid{grid-column:1 / -1;order:3;justify-content:center;flex-wrap:wrap;}.pteam .pts{font-size:34px;min-width:40px;}.pteam .nm{max-width:90px;}}
+
+/* ---------- вход тёмный, как карусели и карточки игр (25.11.2026): фон чернила, сцена сверху, Playfair 700, сургуч акцентом.
+   Цвета переопределены переменными только внутри .intro и .gate — кнопки, классы и счётчики инвертируются сами ---------- */
+.intro,.gate{--ink:#f4efe6;--ink-soft:rgba(244,239,230,.9);--body:rgba(244,239,230,.62);--hairline:rgba(244,239,230,.14);
+  --canvas:#0c0b0a;--canvas-soft:#181715;--wax:#b0261f;--bad:#ff8a7a;color-scheme:dark;box-shadow:none;color:var(--ink);
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E"),
+    radial-gradient(120% 70% at 50% 0%,#1c1714 0%,#0c0b0a 60%) #0c0b0a;background-attachment:local;}
+.intro{overflow-x:hidden;}
+.intro .cover{padding-top:var(--s-2xl);}
+/* верх главной: сцена «Тамани» на всю ширину и тёмный уход в фон */
+#stepMode{position:relative;}
+#stepMode::before{content:"";position:absolute;z-index:-1;top:calc(-1 * var(--s-2xl));left:calc(50% - 50vw);width:100vw;height:clamp(330px,58vw,480px);
+  background:linear-gradient(180deg,rgba(12,11,10,.25) 0%,rgba(12,11,10,.55) 50%,rgba(12,11,10,.8) 100%),url(img/s_taman.webp) center 38%/cover no-repeat;
+  -webkit-mask-image:linear-gradient(180deg,#000 55%,transparent);mask-image:linear-gradient(180deg,#000 55%,transparent);}
+.intro .brand{gap:var(--s-md);padding-top:clamp(40px,10vw,96px);}
+.intro .cover .brand img{width:72px;height:72px;filter:drop-shadow(0 6px 18px rgba(0,0,0,.55));}
+.intro .cover h1{font-weight:700;letter-spacing:-.02em;color:#fff;text-shadow:0 2px 24px rgba(0,0,0,.45);}
+.intro .brand h1{font-size:clamp(42px,12vw,84px)!important;}
+.intro .cover h1::after{content:none;}
+.intro .cover .sub{margin:-14px 0 var(--s-md);padding:0;border:0;font-family:var(--serif);font-style:italic;font-weight:400;font-size:clamp(19px,4.6vw,24px);
+  letter-spacing:0;text-transform:none;color:rgba(255,255,255,.88);text-shadow:0 1px 14px rgba(0,0,0,.6);}
+.intro .step-h{margin:0;padding:0;border:0;font-weight:700;font-size:clamp(32px,8vw,50px);line-height:1.04;letter-spacing:-.02em;}
+.intro .kicker,.gate .kicker{font-family:var(--display);font-style:italic;font-weight:400;font-size:18px;letter-spacing:0;text-transform:none;color:var(--body);}
+.intro .step>.kicker+.step-h{margin-top:-18px;}
+/* что нового и счётчик: без рамок, сургучная линейка слева */
+.intro .whatsnew{margin:0;padding:16px 44px 16px 18px;border:0;border-left:3px solid var(--wax);background:rgba(24,23,21,.82);backdrop-filter:blur(6px);color:var(--ink-soft);}
+.intro .whatsnew b{margin-bottom:6px;font-family:var(--display);font-style:italic;font-weight:400;font-size:20px;letter-spacing:0;text-transform:none;color:#fff;}
+.intro .wn-list strong{color:#fff;}
+.intro .free-bar{border:0;border-left:3px solid var(--wax);padding:14px 16px;background:linear-gradient(90deg,rgba(176,38,31,.24),rgba(176,38,31,.05));color:var(--ink-soft);}
+.intro .free-bar b{color:#fff;}
+.intro .free-go{padding:10px 16px;font-size:14px;transition:background .2s,color .2s;}
+.intro .free-go:hover{background:#fff;}
+/* карточки игр — как были, только выше и без рамки */
+.intro .mode-card{border:0;box-shadow:0 18px 40px -18px rgba(0,0,0,.9);transition:transform .25s var(--ease-in);}
+.intro .mode-card:hover{transform:translateY(-3px);}
+.intro .mode-card .t{font-weight:700;}
+/* как играть */
+.intro .how{border-top:1px solid var(--hairline);padding-top:var(--s-lg);}
+.how-h{margin:0;font-family:var(--display);font-weight:700;font-size:clamp(26px,6vw,34px);line-height:1.1;letter-spacing:-.01em;color:var(--ink);}
+.intro .how-steps .hn{color:var(--wax);}
+.intro .cover .how-steps b{font-weight:700;}
+.intro .ink-btn{background:transparent;border-color:rgba(244,239,230,.38);}
+.intro .ink-btn:hover{background:var(--ink);color:var(--canvas);border-color:var(--ink);}
+/* сцена дня и учителям: тёмные плашки */
+.intro .day-card,.intro .teach-card{border:0;background:var(--canvas-soft);}
+.intro .cover .day-img img{filter:none;}
+.intro .day-card h3,.intro .teach-card h3{font-weight:700;letter-spacing:-.01em;}
+.intro .teach-list{padding-left:0;list-style:none;display:flex;flex-direction:column;gap:6px;}
+.intro .teach-list li{position:relative;padding-left:18px;}
+.intro .teach-list li::before{content:"";position:absolute;left:0;top:.62em;width:8px;height:2px;background:var(--wax);}
+.intro .byline{border-top:1px solid var(--hairline);}
+.intro .byline .byline-ph,.gate .byline .byline-ph{filter:grayscale(1) contrast(1.05);}
+.intro .byline-lab,.gate .byline-lab{font-family:var(--display);font-style:italic;font-weight:400;font-size:15px;letter-spacing:0;text-transform:none;}
+/* кто играет: две большие двери */
+.intro .doors{gap:10px;}
+.intro .door{grid-template-columns:56px 1fr 22px;padding:18px;border:1px solid transparent;border-bottom:1px solid transparent;background:var(--canvas-soft);transition:border-color .2s,transform .2s;}
+.intro .door:hover{border-color:var(--wax);transform:translateY(-2px);}
+.intro .door .ic{width:56px;height:56px;border-color:rgba(244,239,230,.35);}
+.intro .door:hover .ic{background:var(--wax);border-color:var(--wax);color:#fff;}
+.intro .door .t{font-weight:700;}
+.intro .door .d{font-family:var(--text);font-weight:500;}
+.intro .count-lab{font-family:var(--display);font-style:italic;font-weight:400;font-size:19px;letter-spacing:0;text-transform:none;}
+.intro .code-row{border-color:rgba(244,239,230,.38);}
+.intro .code-row input::placeholder{color:rgba(244,239,230,.3);}
+.intro .code-row button{border-left-color:rgba(244,239,230,.38);}
+/* настройка партии */
+.intro .rules{border-top:1px solid var(--hairline);border-bottom:1px solid var(--hairline);}
+.intro .rules summary{font-family:var(--display);font-style:italic;font-weight:400;font-size:19px;letter-spacing:0;text-transform:none;}
+.intro .grade-row button{border-color:rgba(244,239,230,.4)!important;}
+.intro .grade-row button[aria-pressed="true"]{border-color:var(--ink)!important;}
+.intro .grade-row button[aria-pressed="true"] small,.intro .count-row button[aria-pressed="true"] small,.intro .count-row button:hover small{color:rgba(12,11,10,.6);}
+.intro .grade-row button:disabled .box{border-color:rgba(244,239,230,.25);}
+.intro .count-row{border-color:rgba(244,239,230,.4);}
+.intro .count-row button{border-right-color:rgba(244,239,230,.4);}
+.intro .grade-sum b{background:var(--wax);color:#fff;}
+.intro .go-btn:hover{color:#fff;}
+.intro .lesson-bar{border:0;border-left:3px solid var(--wax);background:var(--canvas-soft);}
+/* меню поверх тёмного входа */
+body:has(#intro:not([hidden])) .menu-btn{background:rgba(24,23,21,.9);color:#f4efe6;border-color:rgba(244,239,230,.35);}
+/* экран подписки: та же сцена сверху, крупный вопрос, две кнопки */
+.gate{padding:0 var(--s-lg);}
+.gate::before{content:"";position:fixed;left:0;right:0;top:0;height:min(46vh,420px);pointer-events:none;
+  background:linear-gradient(180deg,rgba(12,11,10,.3),rgba(12,11,10,.7) 60%,rgba(12,11,10,.85)),url(img/s_taman.webp) center 38%/cover no-repeat;
+  -webkit-mask-image:linear-gradient(180deg,#000 45%,transparent);mask-image:linear-gradient(180deg,#000 45%,transparent);}
+.gate .gate-lead{text-shadow:0 1px 12px rgba(0,0,0,.7);}
+.gate-card .msg:empty{display:none;}
+.gate-card{position:relative;padding-top:clamp(48px,14vh,120px);}
+.gate-card img[src$="emblem.png"]{width:64px;height:64px;filter:drop-shadow(0 6px 18px rgba(0,0,0,.55));}
+.gate .gate-card h1{font-weight:700;font-size:clamp(32px,8.6vw,48px);line-height:1.04;letter-spacing:-.02em;color:#fff;text-shadow:0 2px 20px rgba(0,0,0,.5);}
+.gate .gate-lead{color:var(--ink-soft);font-size:17px;line-height:1.5;}
+.gate .gate-lead b{color:#fff;}
+.gate .gate-card .seal-btn:hover{background:#fff;color:#0c0b0a;}
+.gate .gate-card .gate-alt{border-color:rgba(244,239,230,.45);}
+.gate .gate-card .gate-alt:hover{background:var(--ink);color:var(--canvas);}
+.gate .gate-codelink{border-bottom-color:rgba(244,239,230,.4);color:var(--body);}
+.gate .gate-codelink:hover{background:transparent;color:var(--ink);border-bottom-color:var(--ink);}
+.gate .byline{border-top:1px solid var(--hairline);}
+.gate .ink-btn{background:transparent;border-color:rgba(244,239,230,.38);}
+.gate .ink-btn:hover{background:var(--ink);color:var(--canvas);}
+.gate .txt-in::placeholder{color:rgba(244,239,230,.3);}
+@media (min-width:760px){
+  .intro .mode-grid .mode-card{height:340px;}
+  .intro .brand{padding-top:110px;}
+}
 </style>
 
 <div id="app">
@@ -835,29 +939,28 @@ body.present #resTiles,body.present .legend,body.present .rrow .p{display:none!i
     <div class="cover">
       <section class="step" id="stepMode">
         <div class="brand"><img src="img/emblem.png" alt=""><div><h1>Книгоскопъ</h1></div></div>
-        <p class="sub">сцены и герои русской литературы</p>
+        <p class="sub">Угадайте произведение по одной сцене</p>
         <div class="whatsnew" id="whatsNew" hidden><b>Что нового</b><ul class="wn-list">
-          <li><strong>20 новых героев, всего 39:</strong> от Митрофанушки и Садко до Печорина и Воланда. Новые авторы: Фонвизин и Грин.</li>
-          <li><strong>Меню ☰ на всех экранах:</strong> главная, новая партия, библиотека, кабинет учителя.</li>
-          <li><strong>Игру можно поставить на телефон</strong> иконкой, как приложение.</li>
-          <li><strong>«Сцена дня»</strong> в Telegram: понедельник и среда в 17:00, суббота в 14:00.</li>
-          <li><strong>Нашли ошибку в сцене?</strong> Под ответом есть кнопка «Сообщить автору».</li>
+          <li><strong>20 новых героев.</strong> От Митрофанушки до Воланда, всего их теперь 39.</li>
+          <li><strong>Меню ☰</strong> теперь есть на каждом экране.</li>
+          <li><strong>Игру можно поставить на телефон</strong> и открывать как приложение.</li>
+          <li><strong>«Сцена дня»</strong> выходит в Telegram по понедельникам и средам в 17:00, по субботам в 14:00.</li>
+          <li><strong>Заметили ошибку?</strong> Под ответом есть кнопка «Сообщить автору».</li>
         </ul><button id="whatsNewClose" type="button" aria-label="Скрыть">×</button></div>
-        <div class="free-bar" id="freeBar" hidden><span id="freeTxt"></span><button class="free-go" id="freeGo" type="button">Полный доступ</button></div>
-        <p class="kicker">Выберите игру</p>
-        <h2 class="step-h">Что будем узнавать?</h2>
+        <div class="free-bar" id="freeBar" hidden><span id="freeTxt"></span><button class="free-go" id="freeGo" type="button">Открыть все сцены</button></div>
+        <h2 class="step-h">Во что сыграем?</h2>
         <div class="mode-grid">
-        <button class="mode-card" data-mode="scene" type="button"><img src="img/s_strannik.webp" alt=""><span class="tag" id="mcScene">42 сцены</span><span class="num">I</span><span class="in"><span class="t">Угадай сцену</span><span class="d">Войдите в панораму, найдите детали из текста, назовите книгу.</span></span></button>
-        <button class="mode-card" data-mode="hero" type="button"><img src="img/s_h_chatsky.webp" alt=""><span class="tag new" id="mcHero">Новое · 5 героев</span><span class="num">II</span><span class="in"><span class="t">Угадай героя</span><span class="d">Вещи на столе выдадут хозяина.</span></span></button>
+        <button class="mode-card" data-mode="scene" type="button"><img src="img/s_strannik.webp" alt=""><span class="tag" id="mcScene">42 сцены</span><span class="num">I</span><span class="in"><span class="t">Угадай сцену</span><span class="d">Покрутите панораму, найдите детали из текста и назовите произведение.</span></span></button>
+        <button class="mode-card" data-mode="hero" type="button"><img src="img/s_h_chatsky.webp" alt=""><span class="tag new" id="mcHero">Новое · 5 героев</span><span class="num">II</span><span class="in"><span class="t">Угадай героя</span><span class="d">Вещи на столе выдадут своего хозяина.</span></span></button>
         </div>
         <section class="how" aria-labelledby="howH">
-          <p class="kicker" id="howH">Как это работает</p>
+          <h3 class="how-h" id="howH">Как играть</h3>
           <ol class="how-steps">
-            <li><span class="hn">I</span><b>Осмотритесь</b><span>Поворачивайте панораму пальцем или мышью и ищите детали из текста: они спрятаны и не подсвечены.</span></li>
-            <li><span class="hn">II</span><b>Ответьте</b><span>Отметьте направление на шкале, место на карте, выберите автора по портрету и впишите название.</span></li>
-            <li><span class="hn">III</span><b>Узнайте больше</b><span>Получите очки, прочитайте цитату и разбор сцены, ответьте на вопрос в духе ЕГЭ.</span></li>
+            <li><span class="hn">I</span><b>Смотрите</b><span>Крутите сцену пальцем или мышью. Детали из текста спрятаны и ничем не подсвечены.</span></li>
+            <li><span class="hn">II</span><b>Отвечайте</b><span>Направление на шкале, место на карте, автор по портрету и название.</span></li>
+            <li><span class="hn">III</span><b>Читайте</b><span>После ответа вас ждут очки, цитата, разбор сцены и вопрос как на ЕГЭ.</span></li>
           </ol>
-          <div class="how-btns"><button class="ink-btn" type="button" data-video="how-play">▶ Видео: как играть</button><button class="ink-btn" type="button" data-video="how-install">▶ Как поставить на телефон</button></div>
+          <div class="how-btns"><button class="ink-btn" type="button" data-video="how-play">▶ Посмотреть, как играть</button><button class="ink-btn" type="button" data-video="how-install">▶ Поставить на телефон</button></div>
         </section>
         <div class="home-pair">
           <section class="day-card" id="dayCard" hidden>
@@ -867,9 +970,9 @@ body.present #resTiles,body.present .legend,body.present .rrow .p{display:none!i
               <a class="seal-btn day-go" id="dayGo" href="#">Играть сцену дня</a></div>
           </section>
           <section class="teach-card">
-            <p class="kicker">Учителям</p><h3>Урок по сценам за пять минут</h3>
-            <ul class="teach-list"><li>соберите набор сцен или героев по классам</li><li>отправьте классу ссылку: ученики играют без ограничений</li><li>сыграйте командами на проекторе</li><li>распечатайте лист для урока без телефонов</li></ul>
-            <button class="ink-btn" id="teachGo" type="button">Открыть кабинет учителя</button>
+            <p class="kicker">Учителям</p><h3>Урок на сценах за пять минут</h3>
+            <ul class="teach-list"><li>Соберите сцены или героев под свой класс.</li><li>Отправьте ссылку: ученики играют без подписки.</li><li>Играйте командами на проекторе.</li><li>Распечатайте лист, если урок без телефонов.</li></ul>
+            <button class="ink-btn" id="teachGo" type="button">Кабинет учителя</button>
           </section>
         </div>
         <aside class="byline">
@@ -882,13 +985,12 @@ body.present #resTiles,body.present .legend,body.present .rrow .p{display:none!i
       <section class="step" id="stepWho" hidden>
         <button class="back-link" id="backWho" type="button">← Выбор игры</button>
         <p class="kicker" id="whoKick">Угадай сцену</p>
-        <h2 class="step-h">Кто вы?</h2>
-        <p class="step-sub">От этого зависит, что откроется дальше.</p>
+        <h2 class="step-h">Кто играет?</h2>
         <div class="doors">
-          <button class="door" id="doorStudent" type="button"><span class="ic"><svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 9 C11 6 15 7 17 9 C19 7 23 6 29 9 V27 C23 24 19 25 17 27 C15 25 11 24 5 27 Z"/><path d="M17 9 V27"/></svg></span><span><span class="t">Я ученик</span><span class="d">Играть самому: выбрать классы и число вопросов.</span></span><span class="ar">→</span></button>
-          <button class="door" id="doorTeacher" type="button"><span class="ic"><svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="7" width="24" height="16"/><path d="M11 29 h12 M17 23 v6"/><path d="M9 18 l5 -5 4 3 6 -6"/></svg></span><span><span class="t">Я учитель</span><span class="d">Собрать набор, дать ссылку классу, провести командную игру на слайде.</span></span><span class="ar">→</span></button>
+          <button class="door" id="doorStudent" type="button"><span class="ic"><svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 9 C11 6 15 7 17 9 C19 7 23 6 29 9 V27 C23 24 19 25 17 27 C15 25 11 24 5 27 Z"/><path d="M17 9 V27"/></svg></span><span><span class="t">Я ученик</span><span class="d">Играю сам: выбираю классы и сколько вопросов.</span></span><span class="ar">→</span></button>
+          <button class="door" id="doorTeacher" type="button"><span class="ic"><svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="7" width="24" height="16"/><path d="M11 29 h12 M17 23 v6"/><path d="M9 18 l5 -5 4 3 6 -6"/></svg></span><span><span class="t">Я учитель</span><span class="d">Готовлю урок: набор для класса, игра командами, лист для печати.</span></span><span class="ar">→</span></button>
         </div>
-        <p class="count-lab">Есть код урока?</p>
+        <p class="count-lab">Есть код от учителя?</p>
         <div class="code-row"><input id="codeLesson" maxlength="6" autocomplete="off" placeholder="K7QM" aria-label="Код урока"><button id="codeGo" type="button">Войти</button></div>
         <p class="msg" id="codeMsg"></p>
       </section>
@@ -896,7 +998,7 @@ body.present #resTiles,body.present .legend,body.present .rrow .p{display:none!i
       <section class="step" id="stepPlay" hidden>
         <button class="back-link" id="backPlay" type="button">← Назад</button>
         <p class="kicker" id="playKick">Угадай сцену</p>
-        <h2 class="step-h">Настройте игру</h2>
+        <h2 class="step-h">Соберите партию</h2>
         <div class="lesson-bar" id="lessonBar" hidden><span id="lessonTxt"></span><button class="grade-all" id="lessonOff" type="button">Играть все</button></div>
         <details class="rules"><summary>Как играть</summary>
           <ol id="rulesScene">
@@ -1053,18 +1155,17 @@ body.present #resTiles,body.present .legend,body.present .rrow .p{display:none!i
   <div class="gate" id="gate" hidden>
     <div class="gate-card">
       <img src="img/emblem.png" alt="">
-      <h1>Книгоскопъ</h1>
-      <p class="sub">две сцены в день бесплатно</p>
-      <p class="gate-lead">Сегодня две бесплатные сцены уже сыграны. Чтобы открыть все сцены и режимы без ограничений, подпишитесь на канал <b>@egeminkin</b> в Telegram или вступите в сообщество ВКонтакте. Бот проверит подписку и пришлёт ссылку для входа.</p>
-      <a class="seal-btn gate-go" id="gateGo" href="#" target="_blank" rel="noopener">Войти через Telegram</a>
-      <a class="seal-btn gate-go gate-alt" id="gateVk" href="#" target="_blank" rel="noopener">Войти через ВКонтакте</a>
-      <button class="gate-codelink" id="codeToggle" type="button">Вход по коду для коллег</button>
+      <h1 id="gateH">Бесплатные сцены на сегодня закончились</h1>
+      <p class="gate-lead" id="gateLead">Завтра будут ещё две. А чтобы играть сколько хочется, подпишитесь на <b>@egeminkin</b> в Telegram или вступите в группу ВКонтакте. Бот пришлёт ссылку, и откроются все сцены и герои. Это бесплатно.</p>
+      <a class="seal-btn gate-go" id="gateGo" href="#" target="_blank" rel="noopener">Открыть через Telegram</a>
+      <a class="seal-btn gate-go gate-alt" id="gateVk" href="#" target="_blank" rel="noopener">Открыть через ВКонтакте</a>
+      <button class="gate-codelink" id="codeToggle" type="button">У меня есть код</button>
       <form class="gate-code" id="codeForm" hidden autocomplete="off">
         <input class="txt-in" id="codeInput" placeholder="КОД ДОСТУПА" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Код доступа">
         <button class="ink-btn" type="submit">Войти</button>
       </form>
       <p class="msg" id="gateMsg" role="status"></p>
-      <button class="gate-codelink" id="gateBack" type="button">Вернуться на главную</button>
+      <button class="gate-codelink" id="gateBack" type="button">На главную</button>
       <aside class="byline">
         <img class="byline-ph" src="img/author.jpg" alt="Кирилл Минкин">
         <div class="byline-tx"><span class="byline-lab">Автор игры</span><b>Кирилл Минкин</b><small>учитель русского языка и литературы</small></div>
@@ -3122,7 +3223,7 @@ function homeRefresh(){
   const k=window.KG&&KG.info?KG.info():null, bar=$('freeBar');
   if(!k||k.ok){ bar.hidden=true; return; }
   const left=Math.max(0,k.free-k.used); bar.hidden=false;
-  $('freeTxt').innerHTML=left?'Сегодня бесплатно: <b>'+left+' '+(left===1?'сцена':'сцены')+'</b> из '+k.free+'. Без ограничений: через бота в Telegram или ВКонтакте.':'Бесплатные сцены на сегодня сыграны. Откройте полный доступ через бота в Telegram или ВКонтакте.';
+  $('freeTxt').innerHTML=left?(left===1?'Сегодня осталась <b>1 бесплатная сцена</b>.':'Сегодня осталось <b>'+left+' бесплатные сцены</b>.')+' Подпишитесь через бота, и откроются все.':'Бесплатные сцены на сегодня закончились. Завтра будут новые, а через бота можно открыть все сразу.';
 }
 $('freeGo').onclick=()=>{ if(window.KG&&KG.gate) KG.gate(); };
 addEventListener('kgchange',homeRefresh);
@@ -3146,12 +3247,12 @@ $('videoPanel').querySelectorAll('[data-closep]').forEach(b=>b.addEventListener(
     if(idx<0){ const x=D.days[0];
       $('dayCard').classList.add('soon');
       $('dayKick').textContent='Сцена дня'; $('dayH').textContent='Скоро первая сцена дня';
-      $('dayNote').textContent='В Telegram-канале @egeminkin: '+(nextTxt?'первая выйдет '+nextTxt+'. ':'')+'Угадайте произведение в викторине, а детали ищите в игре.';
+      $('dayNote').textContent='Сцены выходят в Telegram-канале @egeminkin.'+(nextTxt?' Первая выйдет '+nextTxt+'.':'')+' Угадываете произведение в викторине, а детали ищете здесь, в игре.';
       $('dayGo').textContent='Канал @egeminkin'; $('dayGo').href='https://t.me/egeminkin'; $('dayGo').target='_blank'; return; }
     const x=D.days[idx%D.days.length], url='?s='+x.id+'&day='+(idx+1);
     $('dayImg').src='img/s_'+x.id+'.webp'; $('dayImgLink').href=url; $('dayGo').href=url;
     $('dayKick').textContent='Сцена дня № '+(idx+1);
-    $('dayNote').textContent='Из Telegram-канала @egeminkin. В игре здесь спрятаны детали из текста.'+(nextTxt?' Следующая сцена выйдет '+nextTxt+'.':'');
+    $('dayNote').textContent='Свежая сцена из Telegram-канала @egeminkin.'+(nextTxt?' Следующая выйдет '+nextTxt+'.':'');
   }).catch(()=>{});
 })();
 
@@ -3177,7 +3278,12 @@ drawRuler();
   document.getElementById('gateVk').href='https://vk.me/'+VK;
   let OK=false, NOTE='';           // OK — подписка подтверждена или вход по коду; NOTE — что сказать, когда экран откроется
   const show=(text,cls)=>{msg.className='msg'+(cls?' '+cls:'');msg.textContent=text||'';};
-  const open=()=>{closeSheets();show(NOTE);gate.hidden=false;gate.scrollTop=0;};
+  const open=()=>{closeSheets();show(NOTE);
+    const out=!OK&&!LESSON&&freeIds().length>=FREE;
+    document.getElementById('gateH').textContent=out?'Бесплатные сцены на сегодня закончились':'Все сцены и герои без счёта';
+    document.getElementById('gateLead').innerHTML=(out?'Завтра будут ещё две. А чтобы играть сколько хочется, подпишитесь':'Без подписки можно сыграть две сцены в день. Чтобы играть сколько хочется, подпишитесь')+
+      ' на <b>@egeminkin</b> в Telegram или вступите в группу ВКонтакте. Бот пришлёт ссылку, и откроются все сцены и герои. Это бесплатно.';
+    gate.hidden=false;gate.scrollTop=0;};
   document.getElementById('gateBack').onclick=()=>{gate.hidden=true;$('result').hidden=true;$('final').hidden=true;$('intro').hidden=false;showStep('stepMode');};
   /* бесплатные сцены считаются по дню (московское время) в этом браузере */
   const today=()=>new Date(Date.now()+3*3600e3).toISOString().slice(0,10);
