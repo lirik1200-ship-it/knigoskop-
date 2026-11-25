@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /archive/
+Disallow: /mockups/
+Disallow: /worker/
+Clean-param: s&day /
+
+Sitemap: https://knigo-skop.ru/sitemap.xml
